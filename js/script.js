@@ -302,8 +302,8 @@ function finishTurn() {
   if (!isTimeout) {
     const totalTime = Math.min(currentEnemy ? Math.ceil(processedWord.length * (currentEnemy.timePerChar || 1.0)) : 10, 20);
     const remainRatio = timer / totalTime;
-    if (remainRatio >= 0.99) {
-      timeBonus = 2.5; // 100%残しで+120%（クリティカル）
+    if (remainRatio >= 0.8) {
+      timeBonus = 2.5; // 80%以上残しでクリティカル
       isCritical = true;
     } else if (remainRatio >= 0.5) {
       timeBonus = 1.5; // 50%以上で+50%
