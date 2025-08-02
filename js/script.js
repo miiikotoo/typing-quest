@@ -1,9 +1,19 @@
 // 敵キャラ情報（弱い順に並んでいる）
 const enemies = [
-  { name: "スライム", maxHP: 20, attack: 10, timePerChar: 1.0 },
+  { name: "スライム", maxHP: 20, attack: 5, timePerChar: 1.0 },
+  { name: "バット", maxHP: 28, attack: 8, timePerChar: 1.1 },
+  { name: "スケルトン", maxHP: 35, attack: 10, timePerChar: 0.95 },
+  { name: "スパイダー", maxHP: 40, attack: 13, timePerChar: 0.9 },
   { name: "ゴブリン", maxHP: 50, attack: 15, timePerChar: 0.8 },
+  { name: "ウルフ", maxHP: 55, attack: 17, timePerChar: 0.85 },
+  { name: "リザードマン", maxHP: 70, attack: 18, timePerChar: 0.7 },
+  { name: "ミミック", maxHP: 65, attack: 22, timePerChar: 0.7 },
   { name: "オーク", maxHP: 80, attack: 20, timePerChar: 0.5 },
-  { name: "ドラゴン", maxHP: 120, attack: 30, timePerChar: 0.3 }
+  { name: "ゴーレム", maxHP: 90, attack: 25, timePerChar: 0.6 },
+  { name: "デーモン", maxHP: 100, attack: 28, timePerChar: 0.5 },
+  { name: "グリフォン", maxHP: 110, attack: 27, timePerChar: 0.4 },
+  { name: "ドラゴン", maxHP: 120, attack: 30, timePerChar: 0.3 },
+  { name: "リッチ", maxHP: 130, attack: 35, timePerChar: 0.3 }
 ];
 
 // お題候補（複数）
@@ -40,28 +50,72 @@ const words = [
   "power",
   "strength",
   "agility",
+  // 短い単語
+  "ice",
+  "wind",
+  "dark",
+  "trap",
+  "key",
+  "ring",
+  "gold",
+  "map",
+  "trap",
+  "bone",
+  // 中程度の単語
+  "phantom",
+  "element",
+  "fortune",
+  "sorcery",
+  "crystal",
+  "monster",
+  "amulet",
+  "shelter",
+  "journey",
+  "mystery",
   // 長めの単語
+  "invincibility",
+  "transformation",
+  "resurrection",
+  "enlightenment",
+  "reincarnation",
+  "unbreakable",
+  "unpredictability",
+  "unquestionably",
+  // 追加: 長めの単語
+  "determination",
+  "manifestation",
   "extraordinary",
-  "unbelievable",
-  "incomprehensible",
-  "unpredictable",
-  "extraordinary",
-  "uncontrollable",
-  "unquestionable",
-  "unforgettable",
-  "unbelievable",
-  "unimaginable",
+  "misunderstanding",
+  "transformationist",
+  "responsibility",
+  "accomplishment",
+  "reincarnationist",
+  "enlightenmental",
+  "unquestionability",
+  "indistinguishable",
   // 長めのフレーズ
-  "The dragon roars fiercely",
-  "The knight draws his sword",
-  "The mage casts a powerful spell",
-  "The goblin sneaks in the shadows",
-  "The warrior charges into battle",
-  "The archer aims for the target",
-  "The healer restores the fallen",
-  "The orc swings his axe",
-  "The wizard conjures a fireball",
-  "The rogue disappears into the night",
+  "The treasure chest was a trap",
+  "A mysterious wind blows gently",
+  "The ancient ruins hide many secrets",
+  "The wizards staff glows in the dark",
+  "The heros courage never falters",
+  "A shadow moves behind the curtain",
+  "The princess waits in the tower",
+  "The final battle begins now",
+  "The spellbook opens by itself",
+  "The enemys power is overwhelming",
+  // 追加: 長めのフレーズ
+  "The ancient prophecy has been fulfilled",
+  "A hidden passage opens behind the wall",
+  "The legendary sword shines brightly",
+  "The mysterious stranger offers guidance",
+  "The castle gates slowly creak open",
+  "The enchanted forest whispers secrets",
+  "The hero stands at the crossroads",
+  "The enemy army approaches the castle",
+  "The magic circle glows with power",
+  "The final key unlocks the secret door",
+  "A sudden silence falls over the land",
 ];
 
 const maxPlayerHP = 100;
@@ -153,8 +207,28 @@ function getWordIndex(nonSpaceIdx) {
 }
 
 function pickRandomWord() {
-  const idx = Math.floor(Math.random() * words.length);
-  return words[idx];
+  // モンスターの強さに応じてお題の長さを調整
+  let wordPool = words;
+  if (currentEnemy) {
+    const name = currentEnemy.name;
+    if (["スライム", "バット", "スケルトン"].includes(name)) {
+      // 短い単語のみ（6文字以下）
+      wordPool = words.filter(w => w.length <= 6 && !w.includes(" "));
+    } else if (["スパイダー", "ゴブリン", "ウルフ", "リザードマン", "ミミック"].includes(name)) {
+      // 中程度の単語（7～10文字、スペースなし）
+      wordPool = words.filter(w => w.length >= 7 && w.length <= 10 && !w.includes(" "));
+    } else if (["オーク", "ゴーレム", "デーモン", "グリフォン"].includes(name)) {
+      // 長めの単語（11文字以上、スペースなし）
+      wordPool = words.filter(w => w.length > 10 && !w.includes(" "));
+    } else if (["ドラゴン", "リッチ"].includes(name)) {
+      // 長めのフレーズ（スペースを含むもの）
+      wordPool = words.filter(w => w.includes(" "));
+    }
+    // 万一該当がなければ全体から出題
+    if (wordPool.length === 0) wordPool = words;
+  }
+  const idx = Math.floor(Math.random() * wordPool.length);
+  return wordPool[idx];
 }
 
 function startBattle(isNewBattle = false) {
@@ -341,10 +415,8 @@ function finishTurn() {
     const accuracy = currentIndex / processedWord.length;
     const missRate = 1 - accuracy;
 
-    let damageToPlayer = Math.floor(currentEnemy.attack * missRate);
-    if (missCount > 0 && damageToPlayer < 3) {
-      damageToPlayer = 3;
-    }
+    // ミスタイプ数に応じて被ダメージを大幅強化
+    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 2);
     if (isTimeout) {
       const minTimeoutDamage = Math.floor(currentEnemy.attack * 0.5);
       damageToPlayer = Math.max(damageToPlayer, minTimeoutDamage);
