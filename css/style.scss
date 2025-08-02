@@ -1,7 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
+
 body {
   font-family: sans-serif;
   text-align: center;
-  margin-top: 50px;
+  margin: 0;
+}
+
+.container {
+  background-image: url(../img/bg01.jpg);
+  height: 100vh;
+  padding: 10px;
 }
 
 #enemy {
@@ -9,73 +17,88 @@ body {
   font-size: 24px;
   font-weight: bold;
 }
-#question {
-  display: none;
-  font-size: 24px;
-  font-weight: bold;
-}
-#timer {
-  display: none;
-}
-#input {
-  position: absolute;
-  left: -9999px; /* 入力欄は画面外に隠す */
-}
-.correct {
-  color: green;
-}
-.underline {
-  border-bottom: 2px solid blue;
-}
-.player-attack {
-  color: green;
-  font-weight: bold;
-}
-.enemy-attack {
-  color: red;
-  font-weight: bold;
-}
-#damageContainerPlayer,
-#damageContainerEnemy {
+
+.battle-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   position: relative;
-  width: 100%;
-  height: 0;
-  pointer-events: none;
-}
-.damage-popup {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-  font-weight: bold;
-  animation: floatUp 1.2s ease-out forwards;
-  white-space: nowrap;
-}
-.damage-player {
-  color: green;
-  top: 50px; /* プレイヤーのダメージ表示位置 */
-}
-.damage-enemy {
-  color: red;
-  top: 150px; /* 敵のダメージ表示位置 */
-}
-@keyframes floatUp {
-  0% {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0px);
+  min-width: 220px;
+  max-width: 600px;
+  min-height: 40px;
+  background: #232323;
+  border-radius: 10px;
+  border: 2.5px solid #fff;
+  margin: 0 auto;
+  padding: 20px 15px;
+
+  /* お題表示（RPG風デザイン） */
+  #question {
+    min-height: 40px;
+    color: #fff;
+    font-size: 24px;
+    font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 224, 102, 0.33);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    .correct {
+      color: blue;
+    }
+
+    .underline {
+      border-bottom: 2px solid blue;
+    }
   }
-  100% {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-40px);
+
+  /* 残り時間表示 */
+  #timer {
+    min-height: 40px;
+    color: #6ec6ff;
+    font-size: 20px;
+    font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(110, 198, 255, 0.33);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+  }
+
+  /* カウントダウン表示 */
+  #countdown {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: #fff;
+    font-size: 32px;
   }
 }
 
+#input {
+  position: absolute;
+  left: -9999px;
+  /* 入力欄は画面外に隠す */
+}
+
+
 /* 入力注意文（バトル前のみ） */
 #inputNotice {
-  color: orange;
+  color: #ff4200;
   font-weight: bold;
   margin-bottom: 10px;
 }
+
 /* 全角警告（常時チェック） */
 #zenkakuWarning {
   color: red;
@@ -83,8 +106,154 @@ body {
   margin-bottom: 10px;
   display: none;
 }
-/* カウントダウン表示 */
-#countdown {
-  font-size: 32px;
-  margin-bottom: 10px;
+
+/* ステータスウィンドウ風パネル */
+.status-panels {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.status-panel {
+  background: #222;
+  border: 3px solid #c9b87a;
+  border-radius: 12px;
+  color: #fff;
+  min-width: 220px;
+  padding: 16px 20px 12px 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+}
+
+.status-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.status-hp {
+  font-size: 18px;
+  margin-top: 6px;
+}
+
+.status-name {
+  font-size: 18px;
+  margin-bottom: 4px;
+  color: #ffb347;
+}
+
+.player-panel {
+  border-color: #6ec6ff;
+}
+
+.enemy-panel {
+  border-color: #ff7675;
+}
+
+/* バトルログ・メッセージウィンドウ */
+.battle-log {
+  background: #222;
+  border: 2px solid #ffe066;
+  border-radius: 10px;
+  color: #fff;
+  min-height: 48px;
+  max-width: 600px;
+  margin: 20px auto 10px auto;
+  padding: 10px 18px;
+  font-size: 18px;
+  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  white-space: pre-line;
+  max-height: 10.5em;
+  /* 1行約1.05em×10行分 */
+  overflow-y: auto;
+}
+
+#startBtn {
+  background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
+  color: #fff;
+  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-size: 22px;
+  font-weight: bold;
+  border: 2.5px solid #b71c1c;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 12px 38px;
+  margin: 18px 0 10px 0;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+#startBtn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #ffeaea 0%, #ff7675 100%);
+  color: #b71c1c;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px) scale(1.04);
+}
+
+#startBtn:disabled {
+  background: #ccc;
+  color: #888;
+  border-color: #bbb;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+#nextBattleBtn {
+  background: linear-gradient(90deg, #6ec6ff 0%, #2196f3 100%);
+  color: #fff;
+  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  border: 2.5px solid #1976d2;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 12px 34px;
+  margin: 18px 0 10px 0;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+#nextBattleBtn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #e3f7ff 0%, #6ec6ff 100%);
+  color: #1976d2;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px) scale(1.04);
+}
+
+#nextBattleBtn:disabled {
+  background: #ccc;
+  color: #888;
+  border-color: #bbb;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+h1 {
+  font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  color: #fffbe6;
+  text-shadow:
+    0 2px 8px #bfa940,
+    0 0 2px #fff,
+    2px 2px 0 #bfa940,
+    0 0 24px #ffe06699;
+  background: linear-gradient(90deg, #ffe066 0%, #ffd700 40%, #fffbe6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 18px;
+  padding: 8px 0 10px 0;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.18));
 }

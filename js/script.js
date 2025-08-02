@@ -51,6 +51,7 @@ const words = [
   "unforgettable",
   "unbelievable",
   "unimaginable",
+  // 長めのフレーズ
   "The dragon roars fiercely",
   "The knight draws his sword",
   "The mage casts a powerful spell",
@@ -88,17 +89,34 @@ let isFirstBattle = true;
 let isTimeout = false; // 時間切れフラグ
 
 function updateHPDisplay() {
-  document.getElementById("playerHP").textContent = `プレイヤーHP: ${playerHP} / ${maxPlayerHP}`;
+  document.getElementById("playerHP").textContent = `HP: ${playerHP} / ${maxPlayerHP}`;
   document.getElementById("enemyHP").textContent = `HP: ${enemyHP} / ${currentEnemy ? currentEnemy.maxHP : 0}`;
 }
 
 function updateEnemyDisplay() {
   if (currentEnemy) {
-    document.getElementById("enemy").textContent = `${currentEnemy.name}`;
+    // ステータスパネルのタイトルを敵名に変更
+    document.querySelector('.enemy-panel .status-title').textContent = currentEnemy.name;
   } else {
-    document.getElementById("enemy").textContent = "敵: なし";
+    document.querySelector('.enemy-panel .status-title').textContent = "敵";
   }
-  document.getElementById("enemy").style.display = currentEnemy ? "block" : "none";
+}
+
+// バトルログにメッセージを追加
+function addBattleLog(message) {
+  const logDiv = document.getElementById("battleLog");
+  if (!logDiv) return;
+  logDiv.innerHTML += message + "<br>";
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
+// バトルログにダメージを表示
+function logDamage(text, isEnemy = false) {
+  if (isEnemy) {
+    addBattleLog(`<span class='damage-label'>${currentEnemy.name}の攻撃</span> <span class='damage-value'>${text}</span>（タイプミス：${missCount}）`);
+  } else {
+    addBattleLog(`<span class='damage-label'>プレイヤーの攻撃</span> <span class='damage-value'>${text}</span>`);
+  }
 }
 
 function updateLiveFeedback() {
@@ -144,6 +162,12 @@ function startBattle(isNewBattle = false) {
     return;
   }
 
+  // 新しいバトル（新しい敵）開始時のみバトルログをリセット
+  if (isNewBattle) {
+    const logDiv = document.getElementById("battleLog");
+    if (logDiv) logDiv.innerHTML = "";
+  }
+
   const startButton = document.getElementById("startBtn");
   if (startButton) {
     startButton.style.display = "none";
@@ -160,11 +184,6 @@ function startBattle(isNewBattle = false) {
     enemyHP = currentEnemy.maxHP;
     updateEnemyDisplay();
   }
-
-  word = pickRandomWord();
-  processedWord = word.toLowerCase().replace(/ /g, "");
-
-  document.getElementById("question").style.display = "none";
 
   document.getElementById("result").textContent = "";
   currentIndex = 0;
@@ -184,7 +203,7 @@ function startBattle(isNewBattle = false) {
   inputField.value = "";
   inputField.disabled = true;
 
-  document.getElementById("question").style.display = "none";
+  // document.getElementById("question").style.display = "none";
   document.getElementById("countdown").textContent = "";
   clearInterval(timerInterval);
   clearInterval(countdownInterval);
@@ -206,14 +225,28 @@ function startBattle(isNewBattle = false) {
       } else {
         clearInterval(countdownInterval);
         document.getElementById("countdown").textContent = "";
-        document.getElementById("question").style.display = "block";
+        // カウントダウン終了時にお題・タイマーを表示
+        word = pickRandomWord();
+        processedWord = word.toLowerCase().replace(/ /g, "");
+        const minTime = 3;
+        const maxTime = 20;
+        const baseTimePerChar = currentEnemy.timePerChar || 1.0;
+        timer = Math.min(maxTime, Math.max(minTime, Math.ceil(processedWord.length * baseTimePerChar)));
+        updateLiveFeedback();
         inputField.disabled = false;
         inputField.focus();
         startTimer();
       }
     }, 1000);
   } else {
-    document.getElementById("question").style.display = "block";
+    // 通常ターン開始時もお題・タイマーを表示
+    word = pickRandomWord();
+    processedWord = word.toLowerCase().replace(/ /g, "");
+    const minTime = 3;
+    const maxTime = 20;
+    const baseTimePerChar = currentEnemy.timePerChar || 1.0;
+    timer = Math.min(maxTime, Math.max(minTime, Math.ceil(processedWord.length * baseTimePerChar)));
+    updateLiveFeedback();
     inputField.disabled = false;
     inputField.focus();
     startTimer();
@@ -253,13 +286,14 @@ function startTimer() {
   isTimeout = false; // タイマー開始時にリセット
 
   const timerDisplay = document.getElementById("timer");
-  timerDisplay.style.display = "block";
-  timerDisplay.textContent = `残り時間: ${timer}秒`;
+  if (timerDisplay) {
+    timerDisplay.textContent = `${timer}`;
+  }
 
   clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     timer--;
-    timerDisplay.textContent = `残り時間: ${timer}秒`;
+    timerDisplay.textContent = `${timer}`;
     if (timer <= 0) {
       clearInterval(timerInterval);
       isTimeout = true; // タイムアウト発生
@@ -268,30 +302,21 @@ function startTimer() {
   }, 1000);
 }
 
-function showDamage(text, isEnemy = false) {
-  // isEnemy: true→被ダメージ(下), false→与ダメージ(上)
-  const container = isEnemy
-    ? document.getElementById("damageContainerEnemy")
-    : document.getElementById("damageContainerPlayer");
-  const div = document.createElement("div");
-  div.className = `damage-popup ${isEnemy ? "damage-enemy" : "damage-player"}`;
-  div.textContent = text;
-  container.appendChild(div);
-
-  // 一定時間後に自動削除
-  setTimeout(() => {
-    container.removeChild(div);
-  }, 2000);
-}
-
 function finishTurn() {
   if (isTurnFinished) return;
   isTurnFinished = true;
 
   clearInterval(timerInterval);
 
-  document.getElementById("timer").style.display = "none";
-  document.getElementById("question").style.display = "none";
+  // お題・タイマーの非表示（innerHTMLリセット方式→visibleクラスとdisplay:noneに戻す）
+  const timerDiv = document.getElementById("timer");
+  if (timerDiv) {
+    timerDiv.textContent = ""; // タイマーをリセット
+  }
+  const questionDiv = document.getElementById("question");
+  if (questionDiv) {
+    questionDiv.querySelector("#word").textContent = ""; // お題をリセット
+  }
 
   const inputField = document.getElementById("input");
   inputField.disabled = true;
@@ -306,13 +331,12 @@ function finishTurn() {
     damageToEnemy = Math.floor(damageToEnemy * 0.5);
   }
 
-  // 1. プレイヤーの攻撃ダメージ演出
   enemyHP -= damageToEnemy;
   if (enemyHP < 0) enemyHP = 0;
   updateHPDisplay();
-  showDamage(`${damageToEnemy}`, false);
+  logDamage(`${damageToEnemy}`, false); // プレイヤーの攻撃をログに表示
 
-  // 2. 0.5秒後に敵の攻撃ダメージ演出
+  // 0.5秒後に敵の攻撃ダメージ演出
   setTimeout(() => {
     const accuracy = currentIndex / processedWord.length;
     const missRate = 1 - accuracy;
@@ -329,19 +353,22 @@ function finishTurn() {
     playerHP -= damageToPlayer;
     if (playerHP < 0) playerHP = 0;
     updateHPDisplay();
-    showDamage(`${damageToPlayer}`, true);
+    logDamage(`${damageToPlayer}`, true); // 敵の攻撃をログに表示
 
-    // 3. さらに0.5秒後にresult表示
+    // さらに0.5秒後にresult表示
     setTimeout(() => {
-      let message = `<p>ミスタイプ数: ${missCount}</p>`;
+      let message = ``;
 
       // 結果判定
       if (enemyHP <= 0 && playerHP <= 0) {
-        message += `<p>両者ともに倒れました…引き分けです。</p>`;
+        addBattleLog("両者ともに倒れた！引き分け！");
+        word = "";
+        processedWord = "";
       } else if (enemyHP <= 0 && playerHP > 0) {
-        message += `<p>敵を倒しました！</p>`;
+        addBattleLog(`${currentEnemy.name}を倒した！`);
         currentEnemyIndex++;
-
+        word = "";
+        processedWord = "";
         if (currentEnemyIndex >= enemies.length) {
           message += `<p>すべての敵を倒しました！あなたの勝利です！🎉</p>`;
           document.getElementById("countdown").textContent = "";
@@ -353,10 +380,13 @@ function finishTurn() {
           }
         }
       } else if (playerHP <= 0) {
-        message += `<p>あなたは倒れました…ゲームオーバーです。</p>`;
+        addBattleLog("あなたは倒れた…ゲームオーバー！");
+        word = "";
+        processedWord = "";
         document.getElementById("countdown").textContent = "";
       } else {
         // 両者生存 → 自動で次ターン
+        addBattleLog("次のターンへ…");
         countdownInterval = setInterval(() => {
           clearInterval(countdownInterval);
           startBattle();

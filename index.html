@@ -1,35 +1,48 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>タイピングバトル</title>
-    <link rel="stylesheet" href="./css/style.css" />
-  </head>
-  <body>
-    <h1>タイピングクエスト</h1>
-    <div id="enemy"></div>
-    <div id="enemyHP"></div>
-    <div id="damageContainerPlayer"></div>
-    <div id="damageContainerEnemy"></div>
 
-    <div id="question">お題: <span id="word"></span></div>
-    <div id="timer">残り時間: <span id="time">10</span>秒</div>
-    <div id="countdown"></div>
+<head>
+  <meta charset="UTF-8" />
+  <title>タイピングバトル</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>タイピングクエスト</h1>
+
+    <!-- ステータスウィンドウ風パネル -->
+    <div class="status-panels">
+      <div class="status-panel player-panel">
+        <div class="status-title">プレイヤー</div>
+        <div class="status-hp">
+          <span id="playerHP">HP: 100 / 100</span>
+        </div>
+      </div>
+      <div class="status-panel enemy-panel">
+        <div class="status-title">敵</div>
+        <div class="status-hp">
+          <span id="enemyHP">HP: 0 / 0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="battle-area">
+      <div id="question"><span id="word"></span></div>
+      <div id="timer"><span id="time"></span></div>
+      <div id="countdown"></div>
+    </div>
+
+    <!-- バトルログ・メッセージウィンドウ -->
+    <div id="battleLog" class="battle-log"></div>
 
     <input id="input" type="text" autocomplete="off" />
 
-    <div id="playerHP">プレイヤーHP: 100 / 100</div>
-
     <div id="result"></div>
 
-    <button id="startBtn" onclick="startBattle(true)">バトル開始</button
-    ><!-- 追加ボタン -->
-    <button
-      id="nextBattleBtn"
-      style="display: none"
-      onclick="startBattle(true)"
-    >
-      次のバトル開始
+    <button id="startBtn" onclick="startBattle(true)">バトル開始</button><!-- 追加ボタン -->
+    <button id="nextBattleBtn" style="display: none" onclick="startBattle(true)">
+      次のバトルへ
     </button>
 
     <!-- 入力注意文（バトル前のみ） -->
@@ -40,7 +53,9 @@
     <div id="zenkakuWarning">
       ※現在、全角文字が含まれています。半角英数で入力してください。
     </div>
+  </div>
 
-    <script src="./js/script.js"></script>
-  </body>
+  <script src="./js/script.js"></script>
+</body>
+
 </html>
