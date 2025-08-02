@@ -170,6 +170,11 @@ body {
   overflow-y: auto;
 }
 
+.battle-log .critical {
+  color: red;
+  font-weight: bold;
+}
+
 #startBtn {
   background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
   color: #fff;

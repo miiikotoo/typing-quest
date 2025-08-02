@@ -172,6 +172,11 @@ body {
   max-height: 10.5em;
   /* 1行約1.05em×10行分 */
   overflow-y: auto;
+
+  .critical {
+    color: red;
+    font-weight: bold;
+  }
 }
 
 #startBtn {

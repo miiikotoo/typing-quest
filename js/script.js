@@ -295,13 +295,30 @@ function finishTurn() {
   inputField.disabled = true;
   const remaining = processedWord.length - currentIndex;
   if (remaining > 0) missCount += remaining;
-  // プレイヤーの攻撃計算もplayerATKを参照
-  let damageToEnemy = currentIndex * playerATK;
+  // --- 攻撃力計算（残り秒数ボーナス付き） ---
+  let baseDamage = currentIndex * playerATK * 0.5;
+  let timeBonus = 1;
+  let isCritical = false;
+  if (!isTimeout) {
+    const totalTime = Math.min(currentEnemy ? Math.ceil(processedWord.length * (currentEnemy.timePerChar || 1.0)) : 10, 20);
+    const remainRatio = timer / totalTime;
+    if (remainRatio >= 0.99) {
+      timeBonus = 2.5; // 100%残しで+120%（クリティカル）
+      isCritical = true;
+    } else if (remainRatio >= 0.5) {
+      timeBonus = 1.5; // 50%以上で+50%
+    }
+  }
+  let damageToEnemy = Math.floor(baseDamage * timeBonus);
   if (isTimeout) damageToEnemy = Math.floor(damageToEnemy * 0.5);
   enemyHP -= damageToEnemy;
   if (enemyHP < 0) enemyHP = 0;
   updateHPDisplay();
-  logDamage(`${damageToEnemy}`, false); // プレイヤーの攻撃をログに表示
+  if (isCritical) {
+    logDamage(`<span class="critical">クリティカル！</span> ${damageToEnemy}`, false);
+  } else {
+    logDamage(`${damageToEnemy}`, false);
+  }
   // 0.5秒後に敵の攻撃ダメージ演出
   setTimeout(() => {
     const accuracy = currentIndex / processedWord.length;
