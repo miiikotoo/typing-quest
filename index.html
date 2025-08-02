@@ -44,7 +44,8 @@
         font-weight: bold;
       }
 
-      #damageContainer {
+      #damageContainerPlayer,
+      #damageContainerEnemy {
         position: relative;
         width: 100%;
         height: 0;
@@ -63,12 +64,12 @@
 
       .damage-player {
         color: green;
-        top: 150px; /* プレイヤーのダメージ表示位置 */
+        top: 50px; /* プレイヤーのダメージ表示位置 */
       }
 
       .damage-enemy {
         color: red;
-        top: 50px; /* 敵のダメージ表示位置 */
+        top: 150px; /* 敵のダメージ表示位置 */
       }
 
       @keyframes floatUp {
@@ -87,11 +88,27 @@
     <h1>タイピングクエスト</h1>
     <div id="enemy"></div>
     <div id="enemyHP"></div>
-    <div id="damageContainer"></div>
+    <div id="damageContainerPlayer"></div>
+    <div id="damageContainerEnemy"></div>
 
     <div id="question">お題: <span id="word"></span></div>
     <div id="timer">残り時間: <span id="time">10</span>秒</div>
     <div id="countdown" style="font-size: 32px; margin-bottom: 10px"></div>
+
+    <!-- 入力注意文（バトル前のみ） -->
+    <div
+      id="inputNotice"
+      style="color: orange; font-weight: bold; margin-bottom: 10px"
+    >
+      ※スタート前に「半角英数入力」になっているか確認してください。
+    </div>
+    <!-- 全角警告（常時チェック） -->
+    <div
+      id="zenkakuWarning"
+      style="color: red; font-weight: bold; margin-bottom: 10px; display: none;"
+    >
+      ※現在、全角文字が含まれています。半角英数で入力してください。
+    </div>
 
     <input id="input" type="text" autocomplete="off" />
 
@@ -108,7 +125,6 @@
     >
       次のバトル開始
     </button>
-
 
     <script src="./js/script.js"></script>
   </body>

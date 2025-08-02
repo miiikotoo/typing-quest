@@ -189,6 +189,10 @@ function startBattle(isNewBattle = false) {
   clearInterval(timerInterval);
   clearInterval(countdownInterval);
 
+  // バトル開始時に注意文を非表示
+  const inputNotice = document.getElementById("inputNotice");
+  if (inputNotice) inputNotice.style.display = "none";
+
   if (isNewBattle) {
     let countdown = 3;
     document.getElementById("countdown").textContent = countdown;
@@ -265,7 +269,10 @@ function startTimer() {
 }
 
 function showDamage(text, isEnemy = false) {
-  const container = document.getElementById("damageContainer");
+  // isEnemy: true→被ダメージ(下), false→与ダメージ(上)
+  const container = isEnemy
+    ? document.getElementById("damageContainerEnemy")
+    : document.getElementById("damageContainerPlayer");
   const div = document.createElement("div");
   div.className = `damage-popup ${isEnemy ? "damage-enemy" : "damage-player"}`;
   div.textContent = text;
@@ -274,7 +281,7 @@ function showDamage(text, isEnemy = false) {
   // 一定時間後に自動削除
   setTimeout(() => {
     container.removeChild(div);
-  }, 2000); // アニメーション時間と合わせる
+  }, 2000);
 }
 
 function finishTurn() {
@@ -303,7 +310,7 @@ function finishTurn() {
   enemyHP -= damageToEnemy;
   if (enemyHP < 0) enemyHP = 0;
   updateHPDisplay();
-  showDamage(`-${damageToEnemy}`, false);
+  showDamage(`${damageToEnemy}`, false);
 
   // 2. 0.5秒後に敵の攻撃ダメージ演出
   setTimeout(() => {
@@ -322,7 +329,7 @@ function finishTurn() {
     playerHP -= damageToPlayer;
     if (playerHP < 0) playerHP = 0;
     updateHPDisplay();
-    showDamage(`-${damageToPlayer}`, true);
+    showDamage(`${damageToPlayer}`, true);
 
     // 3. さらに0.5秒後にresult表示
     setTimeout(() => {
@@ -361,3 +368,34 @@ function finishTurn() {
 
   }, 500); // 敵の攻撃を0.5秒遅らせる
 }
+
+// 半角英数チェック
+function isHalfWidth(str) {
+  // 半角英数・記号のみ許可
+  return /^[\x20-\x7E]*$/.test(str);
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+  const inputField = document.getElementById("input");
+  const startBtn = document.getElementById("startBtn");
+  const inputNotice = document.getElementById("inputNotice");
+  const zenkakuWarning = document.getElementById("zenkakuWarning");
+
+  // 全角警告の表示（常時チェック）
+  inputField.addEventListener("input", function () {
+    if (isHalfWidth(inputField.value)) {
+      zenkakuWarning.style.display = "none";
+      // バトル前のみstartBtn活性化
+      if (inputNotice.style.display !== "none") {
+        startBtn.disabled = false;
+      }
+    } else {
+      zenkakuWarning.style.display = "block";
+      if (inputNotice.style.display !== "none") {
+        startBtn.disabled = true;
+      }
+    }
+  });
+  // 初期状態でボタンを活性/非活性
+  startBtn.disabled = false;
+});
