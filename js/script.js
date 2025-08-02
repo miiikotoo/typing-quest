@@ -366,7 +366,8 @@ function finishTurn() {
     const accuracy = currentIndex / processedWord.length;
     const missRate = 1 - accuracy;
     // ミスタイプ数に応じて被ダメージをさらに強化
-    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 5);
+    // ダメージ = Math.floor(currentEnemy.attack * 0.2 * missCount)
+    let damageToPlayer = Math.floor(currentEnemy.attack * 0.2 * missCount);
     if (isTimeout) {
       const minTimeoutDamage = Math.floor(currentEnemy.attack * 0.5);
       damageToPlayer = Math.max(damageToPlayer, minTimeoutDamage);
