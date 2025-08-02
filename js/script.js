@@ -385,6 +385,14 @@ function finishTurn() {
         currentEnemyIndex++;
         word = "";
         processedWord = "";
+        // 魔王を倒した場合はエンディング画面へ
+        if (currentEnemy.name === '魔王') {
+          addBattleLog("魔王を倒した！");
+          setTimeout(() => {
+            showScreen('ending');
+          }, 3000);
+          return;
+        }
         if (currentEnemyIndex >= stageEnemies.length) {
           addBattleLog("すべての敵を倒した！");
           document.getElementById("countdown").textContent = "";
@@ -435,6 +443,8 @@ function shuffleArray(array) {
 function showScreen(screen) {
   document.getElementById('stageSelectScreen').style.display = (screen === 'stage') ? 'block' : 'none';
   document.getElementById('battleScreen').style.display = (screen === 'battle') ? 'block' : 'none';
+  const ending = document.getElementById('endingScreen');
+  if (ending) ending.style.display = (screen === 'ending') ? 'block' : 'none';
 }
 
 // --- ゲーム初期化 ---
@@ -468,6 +478,16 @@ window.addEventListener('DOMContentLoaded', async function () {
       container.style.backgroundImage = "url('img/bg01.jpg')";
     }
   };
+  // エンディング画面の「タイトルへ」ボタン
+  const endingBtn = document.getElementById('endingToTitleBtn');
+  if (endingBtn) {
+    endingBtn.onclick = function () {
+      showScreen('stage');
+      // 背景も初期化
+      const container = document.querySelector('.container');
+      if (container) container.style.backgroundImage = "url('img/bg01.jpg')";
+    };
+  }
   const inputField = document.getElementById("input");
   const startBtn = document.getElementById("startBtn");
   const inputNotice = document.getElementById("inputNotice");
