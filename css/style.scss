@@ -162,7 +162,6 @@ body {
   border: 2px solid #ffe066;
   border-radius: 10px;
   color: #fff;
-  min-height: 48px;
   max-width: 600px;
   margin: 20px auto 10px auto;
   padding: 10px 18px;
@@ -171,6 +170,7 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   text-align: left;
   white-space: pre-line;
+  min-height: 10.5em;
   max-height: 10.5em;
   /* 1行約1.05em×10行分 */
   overflow-y: auto;

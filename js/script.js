@@ -5,7 +5,9 @@ let enemies = [];
 const stages = {
   field: { name: "草原", start: 0, end: 4 },
   cave: { name: "洞窟", start: 4, end: 9 },
-  castle: { name: "魔王の城", start: 9, end: enemies.length }
+  forest: { name: "魔法の森", start: 0, end: 0 }, // 新ステージ1
+  magma: { name: "マグマの地下ダンジョン", start: 0, end: 0 }, // 旧: tower → 新: magma
+  castle: { name: "魔王の城", start: 9, end: enemies.length } // 魔王の城を最後に
 };
 
 // --- ゲーム状態 ---
@@ -64,24 +66,29 @@ function getWordIndex(nonSpaceIdx) {
 }
 
 function pickRandomWord() {
-  // モンスターの強さに応じてお題の長さを調整
-  if (!currentEnemy) return words[Math.floor(Math.random() * words.length)];
-  const name = currentEnemy.name;
+  // ステージごとにお題の難易度を振り分け
   let wordPool = words;
-  if (["スライム", "バット", "スケルトン"].includes(name)) {
-    // 短い単語のみ（6文字以下）
-    wordPool = words.filter(w => w.length <= 6 && !w.includes(" "));
-  } else if (["スパイダー", "ゴブリン", "ウルフ", "リザードマン", "ミミック"].includes(name)) {
-    // 中程度の単語（7～10文字、スペースなし）
-    wordPool = words.filter(w => w.length >= 7 && w.length <= 10 && !w.includes(" "));
-  } else if (["オーク", "ゴーレム", "デーモン", "グリフォン"].includes(name)) {
-    // 長めの単語（11文字以上、スペースなし）
-    wordPool = words.filter(w => w.length > 10 && !w.includes(" "));
-  } else if (["ドラゴン", "リッチ"].includes(name)) {
-    // 長めのフレーズ（スペースを含むもの）
-    wordPool = words.filter(w => w.includes(" "));
+  switch (selectedStage) {
+    case "field":
+      wordPool = words.filter(w => w.length <= 6 && !w.includes(" "));
+      break;
+    case "cave":
+      wordPool = words.filter(w => w.length >= 7 && w.length <= 10 && !w.includes(" "));
+      break;
+    case "castle":
+      wordPool = words.filter(w => (w.length > 10 && !w.includes(" ")) || w.includes(" "));
+      break;
+    case "forest":
+      // 魔法の森: 魔法・自然・ファンタジー系ワード
+      wordPool = words.filter(w => /magic|crystal|amulet|wind|element|sorcery|phantom|fortune|mystery|shelter|journey|forest|whisper|enchanted|circle|prophecy|wizard|staff|spellbook|stranger|guidance|passage|legendary|enchanted|tower|key|secret|door/i.test(w));
+      break;
+    case "magma":
+      // マグマの地下ダンジョン: 火・熱・地底・危険・強敵系ワード
+      wordPool = words.filter(w => /fire|magma|lava|underground|dungeon|trap|heat|flame|burn|danger|final|bone|dark|enemy|power|unbreakable|invincibility|resurrection|transformation|accomplishment|unquestionability|indistinguishable/i.test(w));
+      break;
+    default:
+      wordPool = words;
   }
-  // 万一該当がなければ全体から出題
   if (wordPool.length === 0) wordPool = words;
   return wordPool[Math.floor(Math.random() * wordPool.length)];
 }
@@ -89,28 +96,46 @@ function pickRandomWord() {
 // --- ステージ・敵管理 ---
 function setStage(stageKey) {
   selectedStage = stageKey;
-  // enemiesの各データにstageプロパティを持たせ、そのstageに該当する敵のみ抽出
-  stageEnemies = enemies.filter(e => {
+  let candidates = enemies.filter(e => {
     if (Array.isArray(e.stage)) {
       return e.stage.includes(stageKey);
     } else if (typeof e.stage === 'string') {
       return e.stage === stageKey;
     }
-    // 互換性のため、stage未指定なら全ステージで出現
     return true;
   });
+  if (stageKey === 'castle') {
+    // 魔王の城は魔王のみ出現
+    stageEnemies = candidates.filter(e => e.name === '魔王');
+  } else {
+    stageEnemies = candidates.length > 5 ? shuffleArray(candidates).slice(0, 5) : candidates;
+  }
   currentEnemyIndex = 0;
   currentEnemy = null;
-}
-
-function updateHPDisplay() {
-  document.getElementById("playerHP").textContent = `HP: ${playerHP} / ${maxPlayerHP}`;
-  document.getElementById("enemyHP").textContent = `HP: ${enemyHP} / ${currentEnemy ? currentEnemy.maxHP : 0}`;
-}
-
-function updateEnemyDisplay() {
-  const title = document.querySelector('.enemy-panel .status-title');
-  if (title) title.textContent = currentEnemy ? currentEnemy.name : "敵";
+  // --- 背景画像切り替え ---
+  const container = document.querySelector('.container');
+  if (container) {
+    let bgPath = '';
+    switch(stageKey) {
+      case 'field':
+        bgPath = 'img/bg-field.jpg'; break;
+      case 'cave':
+        bgPath = 'img/bg-cave.jpg'; break;
+      case 'forest':
+        bgPath = 'img/bg-forest.jpg'; break;
+      case 'magma':
+        bgPath = 'img/bg-magma.jpg'; break;
+      case 'castle':
+        bgPath = 'img/bg-castle.jpg'; break;
+      default:
+        bgPath = '';
+    }
+    if (bgPath) {
+      container.style.backgroundImage = `url('${bgPath}')`;
+    } else {
+      container.style.backgroundImage = '';
+    }
+  }
 }
 
 // --- プレイヤーステータス ---
@@ -326,7 +351,7 @@ function finishTurn() {
     const accuracy = currentIndex / processedWord.length;
     const missRate = 1 - accuracy;
     // ミスタイプ数に応じて被ダメージをさらに強化
-    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 3);
+    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 5);
     if (isTimeout) {
       const minTimeoutDamage = Math.floor(currentEnemy.attack * 0.5);
       damageToPlayer = Math.max(damageToPlayer, minTimeoutDamage);
@@ -380,6 +405,16 @@ function finishTurn() {
   }, 500); // 敵の攻撃を0.5秒遅らせる
 }
 
+// 配列シャッフル用ユーティリティ
+function shuffleArray(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 // --- 画面切り替え用 ---
 function showScreen(screen) {
   document.getElementById('stageSelectScreen').style.display = (screen === 'stage') ? 'block' : 'none';
@@ -411,6 +446,11 @@ window.addEventListener('DOMContentLoaded', async function () {
   backBtn.onclick = function () {
     showScreen('stage');
     backBtn.style.display = 'inline-block'; // ステージ選択画面に戻ったら再表示
+    // ステージ選択画面に戻るとき背景を初期画像に戻す
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.backgroundImage = "url('img/bg01.jpg')";
+    }
   };
   const inputField = document.getElementById("input");
   const startBtn = document.getElementById("startBtn");
@@ -452,3 +492,29 @@ window.addEventListener('DOMContentLoaded', async function () {
   }
   updateStatusDisplay();
 });
+
+// ダミー関数追加
+function updateHPDisplay() {
+  // プレイヤーHP表示
+  const playerHPDiv = document.getElementById("playerHP");
+  if (playerHPDiv) {
+    playerHPDiv.textContent = `HP: ${playerHP} / ${maxPlayerHP}`;
+  }
+  // 敵HP表示
+  const enemyHPDiv = document.getElementById("enemyHP");
+  if (enemyHPDiv && currentEnemy) {
+    enemyHPDiv.textContent = `HP: ${enemyHP} / ${currentEnemy.maxHP}`;
+  } else if (enemyHPDiv) {
+    enemyHPDiv.textContent = `HP: 0 / 0`;
+  }
+}
+
+function updateEnemyDisplay() {
+  // 敵の名前表示（パネル内）
+  const enemyPanel = document.querySelector('.enemy-panel .status-title');
+  if (enemyPanel && currentEnemy) {
+    enemyPanel.textContent = `敵：${currentEnemy.name}`;
+  } else if (enemyPanel) {
+    enemyPanel.textContent = '敵';
+  }
+}
