@@ -13,6 +13,15 @@
     <!-- ステージ選択画面 -->
     <div id="stageSelectScreen" style="display: block;">
       <h1>タイピングクエスト</h1>
+
+      <!-- プレイヤーステータス（ステージ選択画面用） -->
+      <div class="status-panel player-panel" id="stageSelectPlayerStatus" style="max-width:320px;margin:0 auto 18px auto;">
+        <div class="status-title">プレイヤー <span id="playerLevelLabel_stage">Lv:1</span></div>
+        <div class="status-hp"><span id="playerHP_stage">HP: 30 / 30</span></div>
+        <div class="status-atk">ATK: <span id="playerATK_stage">1</span></div>
+        <div class="status-exp">EXP: <span id="playerExp_stage">0</span> / <span id="nextExp_stage">20</span></div>
+      </div>
+
       <div class="stage-select-area">
         <button class="stage-select-btn" data-stage="field">草原</button>
         <button class="stage-select-btn" data-stage="cave">洞窟</button>

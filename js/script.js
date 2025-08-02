@@ -159,6 +159,21 @@ function updateStatusDisplay() {
   // #playerLevelLabelが存在すればレベル表記を更新
   const levelLabel = document.getElementById("playerLevelLabel");
   if (levelLabel) levelLabel.textContent = `Lv:${playerLevel}`;
+  updateStageSelectPlayerStatus();
+}
+
+function updateStageSelectPlayerStatus() {
+  // ステージ選択画面用のプレイヤーステータス表示を更新
+  const lv = document.getElementById("playerLevelLabel_stage");
+  if (lv) lv.textContent = `Lv:${playerLevel}`;
+  const hp = document.getElementById("playerHP_stage");
+  if (hp) hp.textContent = `HP: ${playerHP} / ${maxPlayerHP}`;
+  const atk = document.getElementById("playerATK_stage");
+  if (atk) atk.textContent = playerATK;
+  const exp = document.getElementById("playerExp_stage");
+  if (exp) exp.textContent = playerExp;
+  const nextExpEl = document.getElementById("nextExp_stage");
+  if (nextExpEl) nextExpEl.textContent = nextExp;
 }
 
 // --- バトルログ ---
@@ -386,7 +401,7 @@ function finishTurn() {
           }
         }
       } else if (playerHP <= 0) {
-        addBattleLog("あなたは力尽きた…ゲームオーバー！");
+        addBattleLog("あなたは力尽きた…");
         word = "";
         processedWord = "";
         document.getElementById("countdown").textContent = "";
