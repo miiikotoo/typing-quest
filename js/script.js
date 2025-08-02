@@ -337,11 +337,7 @@ function finishTurn() {
     setTimeout(() => {
       let message = ``;
       // 結果判定
-      if (enemyHP <= 0 && playerHP <= 0) {
-        addBattleLog("両者ともに倒れた！引き分け！");
-        word = "";
-        processedWord = "";
-      } else if (enemyHP <= 0 && playerHP > 0) {
+      if (enemyHP <= 0 && playerHP > 0) {
         addBattleLog(`${currentEnemy.name}を倒した！`);
         addBattleLog(`<span class='exp-gain'>経験値を${currentEnemy.exp}獲得！</span>`); // 経験値獲得ログを追加
         gainExp(currentEnemy.exp);
@@ -362,7 +358,7 @@ function finishTurn() {
           }
         }
       } else if (playerHP <= 0) {
-        addBattleLog("あなたは倒れた…ゲームオーバー！");
+        addBattleLog("あなたは力尽きた…ゲームオーバー！");
         word = "";
         processedWord = "";
         document.getElementById("countdown").textContent = "";
