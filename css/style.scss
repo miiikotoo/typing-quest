@@ -7,9 +7,11 @@ body {
 }
 
 .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   background-image: url(../img/bg01.jpg);
   height: 100vh;
-  padding: 10px;
 }
 
 #enemy {
@@ -179,6 +181,23 @@ body {
   }
 }
 
+.btn-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+
+  .flex-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }
+}
+
 #startBtn {
   background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
   color: #fff;
@@ -189,7 +208,6 @@ body {
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   padding: 12px 38px;
-  margin: 18px 0 10px 0;
   letter-spacing: 2px;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
@@ -243,6 +261,37 @@ body {
   transform: none;
 }
 
+#backToStageBtn {
+  background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
+  color: #7c5c00;
+  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2.5px solid #bfa940;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 10px 25px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+#backToStageBtn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
+  color: #bfa940;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px) scale(1.04);
+}
+
+#backToStageBtn:disabled {
+  background: #ccc;
+  color: #888;
+  border-color: #bbb;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 h1 {
   font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
   font-size: 2.8rem;
@@ -260,5 +309,5 @@ h1 {
   background-clip: text;
   margin-bottom: 18px;
   padding: 8px 0 10px 0;
-  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.18));
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.18));
 }

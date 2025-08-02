@@ -9,59 +9,65 @@
 
 <body>
   <div class="container">
-    <div class="stage-select-area">
-      <label for="stageSelect">ステージ選択：</label>
-      <select id="stageSelect">
-        <option value="field">草原</option>
-        <option value="cave">洞窟</option>
-        <option value="castle">魔王の城</option>
-      </select>
-    </div>
 
-    <h1>タイピングクエスト</h1>
-
-    <!-- ステータスウィンドウ風パネル -->
-    <div class="status-panels">
-      <div class="status-panel player-panel">
-        <div class="status-title">プレイヤー <span id="playerLevelLabel">Lv:1</span></div>
-        <div class="status-hp">
-          <span id="playerHP">HP: 100 / 100</span>
-        </div>
-      </div>
-      <div class="status-panel enemy-panel">
-        <div class="status-title">敵</div>
-        <div class="status-hp">
-          <span id="enemyHP">HP: 0 / 0</span>
-        </div>
+    <!-- ステージ選択画面 -->
+    <div id="stageSelectScreen" style="display: block;">
+      <h1>タイピングクエスト</h1>
+      <div class="stage-select-area">
+        <button class="stage-select-btn" data-stage="field">草原</button>
+        <button class="stage-select-btn" data-stage="cave">洞窟</button>
+        <button class="stage-select-btn" data-stage="castle">魔王の城</button>
       </div>
     </div>
 
-    <div class="battle-area">
-      <div id="question"><span id="word"></span></div>
-      <div id="timer"><span id="time"></span></div>
-      <div id="countdown"></div>
+    <!-- バトル画面 -->
+    <div id="battleScreen" style="display: none;">
+      <!-- ステータスウィンドウ風パネル -->
+      <div class="status-panels">
+        <div class="status-panel player-panel">
+          <div class="status-title">プレイヤー <span id="playerLevelLabel">Lv:1</span></div>
+          <div class="status-hp">
+            <span id="playerHP">HP: 100 / 100</span>
+          </div>
+        </div>
+        <div class="status-panel enemy-panel">
+          <div class="status-title">敵</div>
+          <div class="status-hp">
+            <span id="enemyHP">HP: 0 / 0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="battle-area">
+        <div id="question"><span id="word"></span></div>
+        <div id="timer"><span id="time"></span></div>
+        <div id="countdown"></div>
+      </div>
+
+      <!-- バトルログ・メッセージウィンドウ -->
+      <div id="battleLog" class="battle-log"></div>
+
+      <input id="input" type="text" autocomplete="off" />
+
+      <div class="btn-area">
+        <div class="flex-center">
+          <button id="startBtn" onclick="startBattle(true)">バトル開始</button>
+          <button id="backToStageBtn" type="button">ステージ選択に戻る</button>
+        </div>
+
+        <button id="nextBattleBtn" style="display: none" onclick="startBattle(true)">次のバトルへ</button>
+      </div>
+
+      <!-- 入力注意文（バトル前のみ） -->
+      <div id="inputNotice">
+        ※スタート前に「半角英数入力」になっているか確認してください。
+      </div>
+      <!-- 全角警告（常時チェック） -->
+      <div id="zenkakuWarning">
+        ※現在、全角文字が含まれています。半角英数で入力してください。
+      </div>
     </div>
 
-    <!-- バトルログ・メッセージウィンドウ -->
-    <div id="battleLog" class="battle-log"></div>
-
-    <input id="input" type="text" autocomplete="off" />
-
-    <div id="result"></div>
-
-    <button id="startBtn" onclick="startBattle(true)">バトル開始</button><!-- 追加ボタン -->
-    <button id="nextBattleBtn" style="display: none" onclick="startBattle(true)">
-      次のバトルへ
-    </button>
-
-    <!-- 入力注意文（バトル前のみ） -->
-    <div id="inputNotice">
-      ※スタート前に「半角英数入力」になっているか確認してください。
-    </div>
-    <!-- 全角警告（常時チェック） -->
-    <div id="zenkakuWarning">
-      ※現在、全角文字が含まれています。半角英数で入力してください。
-    </div>
   </div>
 
   <script src="./js/script.js"></script>

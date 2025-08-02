@@ -172,6 +172,9 @@ function updateLiveFeedback() {
 // --- バトル進行 ---
 function startBattle(isNewBattle = false) {
   if (playerHP <= 0 || currentEnemyIndex >= stageEnemies.length) return;
+  // バトル開始時に戻るボタンを非表示
+  const backBtn = document.getElementById('backToStageBtn');
+  if (backBtn) backBtn.style.display = 'none';
   // 新しいバトル（新しい敵）開始時のみバトルログをリセット
   if (isNewBattle) {
     const logDiv = document.getElementById("battleLog");
@@ -191,7 +194,6 @@ function startBattle(isNewBattle = false) {
     enemyHP = currentEnemy.maxHP;
     updateEnemyDisplay();
   }
-  document.getElementById("result").textContent = "";
   currentIndex = 0;
   missCount = 0;
   isTurnFinished = false;
@@ -333,9 +335,7 @@ function finishTurn() {
     if (playerHP < 0) playerHP = 0;
     updateHPDisplay();
     logDamage(`${damageToPlayer}`, true); // 敵の攻撃をログに表示
-    // さらに0.5秒後にresult表示
     setTimeout(() => {
-      let message = ``;
       // 結果判定
       if (enemyHP <= 0 && playerHP > 0) {
         addBattleLog(`${currentEnemy.name}を倒した！`);
@@ -350,6 +350,9 @@ function finishTurn() {
           // ステージクリア時は次のバトルボタンを非表示
           const nextBtn = document.getElementById("nextBattleBtn");
           if (nextBtn) nextBtn.style.display = "none";
+          // バトル終了時に戻るボタンを再表示
+          const backBtn = document.getElementById('backToStageBtn');
+          if (backBtn) backBtn.style.display = 'inline-block';
         } else {
           // 次のバトル開始ボタンを表示
           const nextBtn = document.getElementById("nextBattleBtn");
@@ -362,6 +365,9 @@ function finishTurn() {
         word = "";
         processedWord = "";
         document.getElementById("countdown").textContent = "";
+        // バトル終了時に戻るボタンを再表示
+        const backBtn = document.getElementById('backToStageBtn');
+        if (backBtn) backBtn.style.display = 'inline-block';
       } else {
         // 両者生存 → 自動で次ターン
         addBattleLog("次のターンへ…");
@@ -370,14 +376,42 @@ function finishTurn() {
           startBattle();
         }, 2000);
       }
-      document.getElementById("result").innerHTML = message;
-    }, 500); // result表示をさらに0.5秒遅らせる
+    }, 500);
   }, 500); // 敵の攻撃を0.5秒遅らせる
+}
+
+// --- 画面切り替え用 ---
+function showScreen(screen) {
+  document.getElementById('stageSelectScreen').style.display = (screen === 'stage') ? 'block' : 'none';
+  document.getElementById('battleScreen').style.display = (screen === 'battle') ? 'block' : 'none';
 }
 
 // --- ゲーム初期化 ---
 window.addEventListener('DOMContentLoaded', async function () {
   await loadGameData();
+  // 画面初期化: ステージ選択画面のみ表示
+  showScreen('stage');
+  // ステージ選択ボタンにイベント
+  document.querySelectorAll('.stage-select-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      setStage(btn.dataset.stage);
+      playerHP = maxPlayerHP;
+      const logDiv = document.getElementById('battleLog');
+      if (logDiv) logDiv.innerHTML = '';
+      updateHPDisplay();
+      updateEnemyDisplay();
+      document.getElementById('startBtn').style.display = 'inline-block';
+      document.getElementById('nextBattleBtn').style.display = 'none';
+      updateStatusDisplay();
+      showScreen('battle');
+    });
+  });
+  // 戻るボタンでステージ選択画面に遷移
+  const backBtn = document.getElementById('backToStageBtn');
+  backBtn.onclick = function () {
+    showScreen('stage');
+    backBtn.style.display = 'inline-block'; // ステージ選択画面に戻ったら再表示
+  };
   const inputField = document.getElementById("input");
   const startBtn = document.getElementById("startBtn");
   const inputNotice = document.getElementById("inputNotice");
@@ -406,7 +440,6 @@ window.addEventListener('DOMContentLoaded', async function () {
       setStage(stageSelect.value);
       // ステージ変更時はHPやログなどリセット
       playerHP = maxPlayerHP;
-      document.getElementById("result").textContent = "";
       const logDiv = document.getElementById("battleLog");
       if (logDiv) logDiv.innerHTML = "";
       updateHPDisplay();
