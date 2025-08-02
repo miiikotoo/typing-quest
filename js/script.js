@@ -9,8 +9,11 @@ const stages = {
 };
 
 // --- ゲーム状態 ---
-const maxPlayerHP = 30;
-const playerATK = 1;
+let playerLevel = 1;
+let playerExp = 0;
+let nextExp = 20;
+let maxPlayerHP = 30;
+let playerATK = 1;
 let playerHP = maxPlayerHP;
 let enemyHP = 0;
 let currentEnemy = null;
@@ -86,8 +89,16 @@ function pickRandomWord() {
 // --- ステージ・敵管理 ---
 function setStage(stageKey) {
   selectedStage = stageKey;
-  const { start, end } = stages[stageKey];
-  stageEnemies = enemies.slice(start, end);
+  // enemiesの各データにstageプロパティを持たせ、そのstageに該当する敵のみ抽出
+  stageEnemies = enemies.filter(e => {
+    if (Array.isArray(e.stage)) {
+      return e.stage.includes(stageKey);
+    } else if (typeof e.stage === 'string') {
+      return e.stage === stageKey;
+    }
+    // 互換性のため、stage未指定なら全ステージで出現
+    return true;
+  });
   currentEnemyIndex = 0;
   currentEnemy = null;
 }
@@ -100,6 +111,29 @@ function updateHPDisplay() {
 function updateEnemyDisplay() {
   const title = document.querySelector('.enemy-panel .status-title');
   if (title) title.textContent = currentEnemy ? currentEnemy.name : "敵";
+}
+
+// --- プレイヤーステータス ---
+function gainExp(amount) {
+  playerExp += amount;
+  while (playerExp >= nextExp) {
+    playerExp -= nextExp;
+    playerLevel++;
+    // レベルアップごとにHP・ATK上昇
+    maxPlayerHP += 5;
+    playerATK += 1;
+    playerHP = maxPlayerHP; // レベルアップ時に全回復
+    nextExp = Math.floor(nextExp * 1.3 + 10); // 必要経験値も増加
+    addBattleLog(`<span class='levelup'>レベルが${playerLevel}に上がった！HPと攻撃力が上昇！</span>`);
+    updateStatusDisplay();
+  }
+  updateStatusDisplay();
+}
+
+function updateStatusDisplay() {
+  // #playerLevelLabelが存在すればレベル表記を更新
+  const levelLabel = document.getElementById("playerLevelLabel");
+  if (levelLabel) levelLabel.textContent = `Lv:${playerLevel}`;
 }
 
 // --- バトルログ ---
@@ -261,6 +295,7 @@ function finishTurn() {
   inputField.disabled = true;
   const remaining = processedWord.length - currentIndex;
   if (remaining > 0) missCount += remaining;
+  // プレイヤーの攻撃計算もplayerATKを参照
   let damageToEnemy = currentIndex * playerATK;
   if (isTimeout) damageToEnemy = Math.floor(damageToEnemy * 0.5);
   enemyHP -= damageToEnemy;
@@ -291,6 +326,8 @@ function finishTurn() {
         processedWord = "";
       } else if (enemyHP <= 0 && playerHP > 0) {
         addBattleLog(`${currentEnemy.name}を倒した！`);
+        addBattleLog(`<span class='exp-gain'>経験値を${currentEnemy.exp}獲得！</span>`); // 経験値獲得ログを追加
+        gainExp(currentEnemy.exp);
         currentEnemyIndex++;
         word = "";
         processedWord = "";
@@ -367,4 +404,5 @@ window.addEventListener('DOMContentLoaded', async function () {
     });
     setStage(stageSelect.value); // 初期化
   }
+  updateStatusDisplay();
 });
