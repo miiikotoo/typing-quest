@@ -1,19 +1,20 @@
 // 敵キャラ情報（弱い順に並んでいる）
 const enemies = [
-  { name: "スライム", maxHP: 20, attack: 5, timePerChar: 1.0 },
-  { name: "バット", maxHP: 28, attack: 8, timePerChar: 1.1 },
-  { name: "スケルトン", maxHP: 35, attack: 10, timePerChar: 0.95 },
-  { name: "スパイダー", maxHP: 40, attack: 13, timePerChar: 0.9 },
-  { name: "ゴブリン", maxHP: 50, attack: 15, timePerChar: 0.8 },
-  { name: "ウルフ", maxHP: 55, attack: 17, timePerChar: 0.85 },
-  { name: "リザードマン", maxHP: 70, attack: 18, timePerChar: 0.7 },
-  { name: "ミミック", maxHP: 65, attack: 22, timePerChar: 0.7 },
+  { name: "スライム", maxHP: 15, attack: 5, timePerChar: 1.0 },
+  { name: "バット", maxHP: 20, attack: 8, timePerChar: 1.0 },
+  { name: "スケルトン", maxHP: 30, attack: 10, timePerChar: 0.95 },
+  { name: "スパイダー", maxHP: 35, attack: 13, timePerChar: 0.9 },
+  { name: "ゴブリン", maxHP: 45, attack: 15, timePerChar: 0.8 },
+  { name: "ウルフ", maxHP: 50, attack: 17, timePerChar: 0.85 },
+  { name: "リザードマン", maxHP: 60, attack: 18, timePerChar: 0.7 },
+  { name: "ミミック", maxHP: 55, attack: 22, timePerChar: 0.7 },
   { name: "オーク", maxHP: 80, attack: 20, timePerChar: 0.5 },
-  { name: "ゴーレム", maxHP: 90, attack: 25, timePerChar: 0.6 },
-  { name: "デーモン", maxHP: 100, attack: 28, timePerChar: 0.5 },
-  { name: "グリフォン", maxHP: 110, attack: 27, timePerChar: 0.4 },
-  { name: "ドラゴン", maxHP: 120, attack: 30, timePerChar: 0.3 },
-  { name: "リッチ", maxHP: 130, attack: 35, timePerChar: 0.3 }
+  { name: "ゴーレム", maxHP: 90, attack: 80, timePerChar: 0.6 },
+  { name: "デーモン", maxHP: 100, attack: 85, timePerChar: 0.5 },
+  { name: "グリフォン", maxHP: 110, attack: 85, timePerChar: 0.4 },
+  { name: "ドラゴン", maxHP: 120, attack: 88, timePerChar: 0.3 },
+  { name: "リッチ", maxHP: 130, attack: 90, timePerChar: 0.3 },
+  { name: "魔王", maxHP: 500, attack: 100, timePerChar: 0.2 }
 ];
 
 // お題候補（複数）
@@ -118,7 +119,7 @@ const words = [
   "A sudden silence falls over the land",
 ];
 
-const maxPlayerHP = 100;
+const maxPlayerHP = 30;
 let playerHP = maxPlayerHP;
 
 let enemyHP = 0;
@@ -136,11 +137,29 @@ let currentIndex = 0;
 let missCount = 0;
 let isTurnFinished = false;
 
-const playerATK = 20;
+const playerATK = 1;
 
 let isFirstBattle = true;
 
 let isTimeout = false; // 時間切れフラグ
+
+// ステージごとの敵インデックス範囲
+const stages = {
+  field: { name: "草原", start: 0, end: 4 }, // スライム〜ゴブリン
+  cave: { name: "洞窟", start: 4, end: 9 },  // ウルフ〜ゴーレム
+  castle: { name: "魔王の城", start: 9, end: enemies.length } // デーモン〜リッチ
+};
+
+let selectedStage = "field";
+let stageEnemies = [];
+
+function setStage(stageKey) {
+  selectedStage = stageKey;
+  const { start, end } = stages[stageKey];
+  stageEnemies = enemies.slice(start, end);
+  currentEnemyIndex = 0;
+  currentEnemy = null;
+}
 
 function updateHPDisplay() {
   document.getElementById("playerHP").textContent = `HP: ${playerHP} / ${maxPlayerHP}`;
@@ -232,7 +251,7 @@ function pickRandomWord() {
 }
 
 function startBattle(isNewBattle = false) {
-  if (playerHP <= 0 || currentEnemyIndex >= enemies.length) {
+  if (playerHP <= 0 || currentEnemyIndex >= stageEnemies.length) {
     return;
   }
 
@@ -254,7 +273,7 @@ function startBattle(isNewBattle = false) {
 
   // 新しい敵をセット（初回または前の敵を倒した場合）
   if (!currentEnemy || enemyHP <= 0) {
-    currentEnemy = enemies[currentEnemyIndex];
+    currentEnemy = stageEnemies[currentEnemyIndex];
     enemyHP = currentEnemy.maxHP;
     updateEnemyDisplay();
   }
@@ -398,8 +417,7 @@ function finishTurn() {
   const remaining = processedWord.length - currentIndex;
   if (remaining > 0) missCount += remaining;
 
-  const damagePerChar = 2;
-  let damageToEnemy = currentIndex * damagePerChar;
+  let damageToEnemy = currentIndex * playerATK;
 
   if (isTimeout) {
     damageToEnemy = Math.floor(damageToEnemy * 0.5);
@@ -415,8 +433,8 @@ function finishTurn() {
     const accuracy = currentIndex / processedWord.length;
     const missRate = 1 - accuracy;
 
-    // ミスタイプ数に応じて被ダメージを大幅強化
-    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 2);
+    // ミスタイプ数に応じて被ダメージをさらに強化
+    let damageToPlayer = Math.floor(currentEnemy.attack * missRate + missCount * 3);
     if (isTimeout) {
       const minTimeoutDamage = Math.floor(currentEnemy.attack * 0.5);
       damageToPlayer = Math.max(damageToPlayer, minTimeoutDamage);
@@ -441,9 +459,12 @@ function finishTurn() {
         currentEnemyIndex++;
         word = "";
         processedWord = "";
-        if (currentEnemyIndex >= enemies.length) {
-          message += `<p>すべての敵を倒しました！あなたの勝利です！🎉</p>`;
+        if (currentEnemyIndex >= stageEnemies.length) {
+          addBattleLog("すべての敵を倒した！");
           document.getElementById("countdown").textContent = "";
+          // ステージクリア時は次のバトルボタンを非表示
+          const nextBtn = document.getElementById("nextBattleBtn");
+          if (nextBtn) nextBtn.style.display = "none";
         } else {
           // 次のバトル開始ボタンを表示
           const nextBtn = document.getElementById("nextBattleBtn");
@@ -482,6 +503,7 @@ window.addEventListener('DOMContentLoaded', function () {
   const startBtn = document.getElementById("startBtn");
   const inputNotice = document.getElementById("inputNotice");
   const zenkakuWarning = document.getElementById("zenkakuWarning");
+  const stageSelect = document.getElementById("stageSelect");
 
   // 全角警告の表示（常時チェック）
   inputField.addEventListener("input", function () {
@@ -500,4 +522,22 @@ window.addEventListener('DOMContentLoaded', function () {
   });
   // 初期状態でボタンを活性/非活性
   startBtn.disabled = false;
+
+  // ステージ選択UIのイベント
+  if (stageSelect) {
+    stageSelect.addEventListener("change", function () {
+      setStage(stageSelect.value);
+      // ステージ変更時はHPやログなどリセット
+      playerHP = maxPlayerHP;
+      document.getElementById("result").textContent = "";
+      const logDiv = document.getElementById("battleLog");
+      if (logDiv) logDiv.innerHTML = "";
+      updateHPDisplay();
+      updateEnemyDisplay();
+      // ボタン再表示
+      document.getElementById("startBtn").style.display = "inline-block";
+      document.getElementById("nextBattleBtn").style.display = "none";
+    });
+    setStage(stageSelect.value); // 初期化
+  }
 });
