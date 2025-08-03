@@ -151,8 +151,10 @@ function gainExp(amount) {
     nextExp = Math.floor(nextExp * 1.3 + 10); // 必要経験値も増加
     addBattleLog(`<span class='levelup'>レベルが${playerLevel}に上がった！HPと攻撃力が上昇！</span>`);
     updateStatusDisplay();
+    savePlayerStatus();
   }
   updateStatusDisplay();
+  savePlayerStatus();
 }
 
 function updateStatusDisplay() {
@@ -382,6 +384,7 @@ function finishTurn() {
         addBattleLog(`${currentEnemy.name}を倒した！`);
         addBattleLog(`<span class='exp-gain'>経験値を${currentEnemy.exp}獲得！</span>`); // 経験値獲得ログを追加
         gainExp(currentEnemy.exp);
+        savePlayerStatus(); // モンスター撃破時にセーブ
         currentEnemyIndex++;
         word = "";
         processedWord = "";
@@ -447,8 +450,37 @@ function showScreen(screen) {
   if (ending) ending.style.display = (screen === 'ending') ? 'block' : 'none';
 }
 
+// --- ステータス保存・読込 ---
+function savePlayerStatus() {
+  const data = {
+    playerLevel,
+    playerExp,
+    nextExp,
+    maxPlayerHP,
+    playerATK,
+    playerHP
+  };
+  localStorage.setItem('typingQuestPlayerStatus', JSON.stringify(data));
+}
+
+function loadPlayerStatus() {
+  const data = localStorage.getItem('typingQuestPlayerStatus');
+  if (data) {
+    try {
+      const obj = JSON.parse(data);
+      playerLevel = obj.playerLevel ?? 1;
+      playerExp = obj.playerExp ?? 0;
+      nextExp = obj.nextExp ?? 20;
+      maxPlayerHP = obj.maxPlayerHP ?? 30;
+      playerATK = obj.playerATK ?? 1;
+      playerHP = obj.playerHP ?? maxPlayerHP;
+    } catch (e) {}
+  }
+}
+
 // --- ゲーム初期化 ---
 window.addEventListener('DOMContentLoaded', async function () {
+  loadPlayerStatus();
   await loadGameData();
   // 画面初期化: ステージ選択画面のみ表示
   showScreen('stage');
