@@ -9,22 +9,24 @@
   { "name": "リザードマン", "maxHP": 132, "attack": 28, "timePerChar": 0.8, "exp": 12, "stage": "cave" },
   { "name": "ミミック", "maxHP": 132, "attack": 35, "timePerChar": 0.8, "exp": 12, "stage": "cave" },
 
-  { "name": "ダークエルフ", "maxHP": 220, "attack": 33, "timePerChar": 0.75, "exp": 15, "stage": "forest" },
-  { "name": "トレント", "maxHP": 240, "attack": 35, "timePerChar": 0.75, "exp": 15, "stage": "forest" },
-  { "name": "フェアリー", "maxHP": 245, "attack": 30, "timePerChar": 0.7, "exp": 18, "stage": "forest" },
-  { "name": "ユニコーン", "maxHP": 245, "attack": 38, "timePerChar": 0.7, "exp": 18, "stage": "forest" },
+  { "name": "ダークエルフ", "maxHP": 220, "attack": 33, "timePerChar": 0.75, "exp": 31, "stage": "forest" },
+  { "name": "トレント", "maxHP": 240, "attack": 35, "timePerChar": 0.75, "exp": 30, "stage": "forest" },
+  { "name": "フェアリー", "maxHP": 245, "attack": 30, "timePerChar": 0.7, "exp": 32, "stage": "forest" },
+  { "name": "ユニコーン", "maxHP": 245, "attack": 38, "timePerChar": 0.7, "exp": 35, "stage": "forest" },
+  { "name": "ハーピー", "maxHP": 260, "attack": 22, "timePerChar": 0.5, "exp": 22, "stage": "forest" },
 
   { "name": "ガーゴイル", "maxHP": 60, "attack": 22, "timePerChar": 0.65, "exp": 22, "stage": "tower" },
-  { "name": "ハーピー", "maxHP": 60, "attack": 22, "timePerChar": 0.65, "exp": 22, "stage": "tower" },
   { "name": "キマイラ", "maxHP": 65, "attack": 25, "timePerChar": 0.6, "exp": 25, "stage": "tower" },
   { "name": "ペガサス", "maxHP": 65, "attack": 25, "timePerChar": 0.6, "exp": 25, "stage": "tower" },
   { "name": "オーク", "maxHP": 300, "attack": 40, "timePerChar": 0.5, "exp": 40, "stage": "tower" },
 
-  { "name": "ゴーレム", "maxHP": 420, "attack": 51, "timePerChar": 0.5, "exp": 45, "stage": "magma" },
-  { "name": "デーモン", "maxHP": 450, "attack": 60, "timePerChar": 0.45, "exp": 50, "stage": "magma" },
-  { "name": "グリフォン", "maxHP": 500, "attack": 55, "timePerChar": 0.45, "exp": 60, "stage": "magma" },
-  { "name": "ドラゴン", "maxHP": 800, "attack": 65, "timePerChar": 0.4, "exp": 80, "stage": "magma" },
-  { "name": "リッチ", "maxHP": 1000, "attack": 73, "timePerChar": 0.3, "exp": 1000, "stage": "magma" },
+  { "name": "ゴーレム", "maxHP": 700, "attack": 51, "timePerChar": 0.5, "exp": 145, "stage": "magma" },
+  { "name": "デーモン", "maxHP": 450, "attack": 60, "timePerChar": 0.45, "exp": 150, "stage": "magma" },
+  { "name": "グリフォン", "maxHP": 500, "attack": 55, "timePerChar": 0.45, "exp": 140, "stage": "magma" },
+  { "name": "ドラゴン", "maxHP": 800, "attack": 65, "timePerChar": 0.5, "exp": 200, "stage": "magma" },
+  { "name": "リッチ", "maxHP": 700, "attack": 73, "timePerChar": 0.45, "exp": 1000, "stage": "magma" },
 
-  { "name": "魔王", "maxHP": 9, "attack": 999, "timePerChar": 1.2, "exp": 99999, "stage": "castle" }
+  { "name": "魔王", "maxHP": 5000, "attack": 99, "timePerChar": 0.33, "exp": 99999, "stage": "castle" },
+
+  { "name": "神", "maxHP": 9999, "attack": 999, "timePerChar": 0.2, "exp": 999999, "stage": "secret" }
 ]
