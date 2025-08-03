@@ -106,13 +106,11 @@ function setStage(stageKey) {
     return true;
   });
   if (stageKey === 'castle') {
-    // 魔王の城は魔王のみ出現
     stageEnemies = candidates.filter(e => e.name === '魔王');
   } else if (stageKey === 'secret') {
-    // 隠しステージ: 裏ボスのみ出現
     stageEnemies = candidates.filter(e => e.stage === 'secret');
   } else {
-    stageEnemies = candidates.length > 5 ? shuffleArray(candidates).slice(0, 5) : candidates;
+    stageEnemies = candidates; // 無限ループ用に全候補を使う
   }
   currentEnemyIndex = 0;
   currentEnemy = null;
@@ -219,7 +217,10 @@ function updateLiveFeedback() {
 
 // --- バトル進行 ---
 function startBattle(isNewBattle = false) {
-  if (playerHP <= 0 || currentEnemyIndex >= stageEnemies.length) return;
+  if (playerHP <= 0 || stageEnemies.length === 0) return;
+  // バトル開始時にバトル開始ボタンを必ず非表示
+  const startButton = document.getElementById("startBtn");
+  if (startButton) startButton.style.display = "none";
   // バトル開始時に戻るボタンを非表示
   const backBtn = document.getElementById('backToStageBtn');
   if (backBtn) backBtn.style.display = 'none';
@@ -227,18 +228,12 @@ function startBattle(isNewBattle = false) {
   if (isNewBattle) {
     const logDiv = document.getElementById("battleLog");
     if (logDiv) logDiv.innerHTML = "";
-  }
-  const startButton = document.getElementById("startBtn");
-  if (startButton) {
-    startButton.style.display = "none";
-  }
-  const nextBattleBtn = document.getElementById("nextBattleBtn");
-  if (nextBattleBtn) {
-    nextBattleBtn.style.display = "none";
-  }
-  // 新しい敵をセット（初回または前の敵を倒した場合）
-  if (!currentEnemy || enemyHP <= 0) {
-    currentEnemy = stageEnemies[currentEnemyIndex];
+    // 新バトル時は必ず新しい敵をセット
+    currentEnemy = stageEnemies[Math.floor(Math.random() * stageEnemies.length)];
+    enemyHP = currentEnemy.maxHP;
+    updateEnemyDisplay();
+  } else if (!currentEnemy || enemyHP <= 0) {
+    currentEnemy = stageEnemies[Math.floor(Math.random() * stageEnemies.length)];
     enemyHP = currentEnemy.maxHP;
     updateEnemyDisplay();
   }
@@ -253,7 +248,6 @@ function startBattle(isNewBattle = false) {
   const inputField = document.getElementById("input");
   inputField.value = "";
   inputField.disabled = true;
-  // document.getElementById("question").style.display = "none";
   document.getElementById("countdown").textContent = "";
   clearInterval(timerInterval);
   clearInterval(countdownInterval);
@@ -404,36 +398,39 @@ function finishTurn() {
       // 結果判定
       if (enemyHP <= 0 && playerHP > 0) {
         addBattleLog(`${currentEnemy.name}を倒した！`);
-        addBattleLog(`<span class='exp-gain'>経験値を${currentEnemy.exp}獲得！</span>`); // 経験値獲得ログを追加
+        addBattleLog(`<span class='exp-gain'>経験値を${currentEnemy.exp}獲得！</span>`);
         gainExp(currentEnemy.exp);
-        savePlayerStatus(); // モンスター撃破時にセーブ
-        currentEnemyIndex++;
-        word = "";
-        processedWord = "";
-        // 魔王を倒した場合はエンディング画面へ
-        if (currentEnemy.name === '魔王') {
-          addBattleLog("魔王を倒した！");
-          setTimeout(() => {
-            showScreen('ending');
-          }, 3000);
-          return;
-        }
-        if (currentEnemyIndex >= stageEnemies.length) {
-          addBattleLog("すべての敵を倒した！");
+        savePlayerStatus();
+        // --- 無限ループ仕様: 次の敵をランダムで選ぶ ---
+        if (selectedStage === 'castle' || selectedStage === 'secret') {
+          // 魔王・裏ボスは1体のみ
+          word = "";
+          processedWord = "";
           document.getElementById("countdown").textContent = "";
-          // ステージクリア時は次のバトルボタンを非表示
           const nextBtn = document.getElementById("nextBattleBtn");
           if (nextBtn) nextBtn.style.display = "none";
-          // バトル終了時に戻るボタンを再表示
           const backBtn = document.getElementById('backToStageBtn');
           if (backBtn) backBtn.style.display = 'inline-block';
-        } else {
-          // 次のバトル開始ボタンを表示
-          const nextBtn = document.getElementById("nextBattleBtn");
-          if (nextBtn) {
-            nextBtn.style.display = "inline-block";
+          // 魔王・裏ボス撃破時はエンディング画面へ
+          if (currentEnemy.name === '魔王') {
+            addBattleLog("魔王を倒した！");
+            setTimeout(() => {
+              showScreen('ending');
+            }, 3000);
           }
+          return;
         }
+        // 通常ステージ: 無限ループで次の敵をランダム選出
+        currentEnemy = stageEnemies[Math.floor(Math.random() * stageEnemies.length)];
+        enemyHP = currentEnemy.maxHP;
+        word = "";
+        processedWord = "";
+        document.getElementById("countdown").textContent = "";
+        // バトル終了時に「次のバトルを開始」ボタンを表示
+        const nextBtn = document.getElementById("nextBattleBtn");
+        if (nextBtn) nextBtn.style.display = "inline-block";
+        const backBtn = document.getElementById('backToStageBtn');
+        if (backBtn) backBtn.style.display = 'inline-block';
       } else if (playerHP <= 0) {
         addBattleLog("あなたは力尽きた…");
         word = "";
@@ -595,6 +592,15 @@ window.addEventListener('DOMContentLoaded', async function () {
     setStage(stageSelect.value); // 初期化
   }
   updateStatusDisplay();
+
+  const nextBattleBtn = document.getElementById("nextBattleBtn");
+  if (nextBattleBtn) {
+    nextBattleBtn.onclick = function () {
+      // 新たな敵でバトル再開
+      startBattle(true);
+      nextBattleBtn.style.display = "none";
+    };
+  }
 });
 
 // ダミー関数追加
