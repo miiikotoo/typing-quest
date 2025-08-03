@@ -22,11 +22,20 @@
         <div class="status-exp">EXP: <span id="playerExp_stage">0</span> / <span id="nextExp_stage">20</span></div>
       </div>
 
+      <!-- 言語切替セレクトボックス -->
+      <div style="margin-bottom: 18px;">
+        <label for="langSelect" style="font-weight:bold;">出題言語：</label>
+        <select id="langSelect">
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+        </select>
+      </div>
+
       <div class="stage-select-area">
         <button class="stage-select-btn" data-stage="field">草原</button>
         <button class="stage-select-btn" data-stage="cave">洞窟</button>
         <button class="stage-select-btn" data-stage="forest">魔法の森</button>
-        <button class="stage-select-btn" data-stage="magma">マグマの地下ダンジョン</button>
+        <button class="stage-select-btn" data-stage="magma">地下神殿</button>
         <button class="stage-select-btn" data-stage="castle">魔王の城</button>
         <button class="stage-select-btn" id="secretStageBtn" data-stage="secret" style="display:none;">???</button>
       </div>

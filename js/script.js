@@ -6,7 +6,7 @@ const stages = {
   field: { name: "草原", start: 0, end: 4 },
   cave: { name: "洞窟", start: 4, end: 9 },
   forest: { name: "魔法の森", start: 0, end: 0 },
-  magma: { name: "マグマの地下ダンジョン", start: 0, end: 0 },
+  magma: { name: "地下神殿", start: 0, end: 0 },
   castle: { name: "魔王の城", start: 9, end: enemies.length },
   secret: { name: "裏ダンジョン", start: 0, end: 0 } // 隠しステージ
 };
@@ -35,6 +35,8 @@ let isTimeout = false;
 
 // --- データ外部読み込み ---
 let words = [];
+let words_ja = [];
+let langMode = 'ja'; // 'ja' or 'en'
 
 async function loadGameData() {
   const [enemiesRes, wordsRes] = await Promise.all([
@@ -42,7 +44,17 @@ async function loadGameData() {
     fetch('js/words.json')
   ]);
   enemies = await enemiesRes.json();
-  words = await wordsRes.json();
+  const wordsJson = await wordsRes.json();
+  if (Array.isArray(wordsJson)) {
+    words = wordsJson;
+    words_ja = [];
+  } else {
+    words = wordsJson.words || [];
+    // words_jaを { ja, roma } 形式に変換
+    words_ja = (wordsJson.words_ja || []).map(w =>
+      typeof w === "string" ? { ja: w, roma: kanaToRomaji(w) } : w
+    );
+  }
 }
 
 // --- ユーティリティ ---
@@ -66,32 +78,181 @@ function getWordIndex(nonSpaceIdx) {
   return -1;
 }
 
-function pickRandomWord() {
-  // ステージごとにお題の難易度を振り分け
-  let wordPool = words;
-  switch (selectedStage) {
-    case "field":
-      wordPool = words.filter(w => w.length <= 6 && !w.includes(" "));
-      break;
-    case "cave":
-      wordPool = words.filter(w => w.length >= 7 && w.length <= 10 && !w.includes(" "));
-      break;
-    case "castle":
-      wordPool = words.filter(w => (w.length > 10 && !w.includes(" ")) || w.includes(" "));
-      break;
-    case "forest":
-      // 魔法の森: 魔法・自然・ファンタジー系ワード
-      wordPool = words.filter(w => /magic|crystal|amulet|wind|element|sorcery|phantom|fortune|mystery|shelter|journey|forest|whisper|enchanted|circle|prophecy|wizard|staff|spellbook|stranger|guidance|passage|legendary|enchanted|tower|key|secret|door/i.test(w));
-      break;
-    case "magma":
-      // マグマの地下ダンジョン: 火・熱・地底・危険・強敵系ワード
-      wordPool = words.filter(w => /fire|magma|lava|underground|dungeon|trap|heat|flame|burn|danger|final|bone|dark|enemy|power|unbreakable|invincibility|resurrection|transformation|accomplishment|unquestionability|indistinguishable/i.test(w));
-      break;
-    default:
-      wordPool = words;
+// --- ローマ字変換テーブル（拡張版: 小文字・複数表記対応） ---
+const kanaToRomajiMap = {
+  'あ':'a','い':'i','う':'u','え':'e','お':'o',
+  'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
+  'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
+  'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+  'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
+  'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
+  'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
+  'や':'ya','ゆ':'yu','よ':'yo',
+  'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
+  'わ':'wa','を':'wo','ん':'n',
+  'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
+  'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo',
+  'だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do',
+  'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
+  'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po',
+  // 拗音・小文字対応
+  'きゃ':['kya','kilya'], 'きゅ':['kyu','kiyu'], 'きょ':['kyo','kiyo'],
+  'しゃ':['sha','sya'], 'しゅ':['shu','syu'], 'しょ':['sho','syo'],
+  'ちゃ':['cha','tya','cya'], 'ちゅ':['chu','tyu','cyu'], 'ちょ':['cho','tyo','cyo'],
+  'にゃ':['nya'], 'にゅ':['nyu'], 'にょ':['nyo'],
+  'ひゃ':['hya'], 'ひゅ':['hyu'], 'ひょ':['hyo'],
+  'みゃ':['mya'], 'みゅ':['myu'], 'みょ':['myo'],
+  'りゃ':['rya'], 'りゅ':['ryu'], 'りょ':['ryo'],
+  'ぎゃ':['gya'], 'ぎゅ':['gyu'], 'ぎょ':['gyo'],
+  'じゃ':['ja','jya','zya'], 'じゅ':['ju','jyu','zyu'], 'じょ':['jo','jyo','zyo'],
+  'びゃ':['bya'], 'びゅ':['byu'], 'びょ':['byo'],
+  'ぴゃ':['pya'], 'ぴゅ':['pyu'], 'ぴょ':['pyo'],
+  // 小文字
+  'ぁ':['xa','la'], 'ぃ':['xi','li'], 'ぅ':['xu','lu'], 'ぇ':['xe','le'], 'ぉ':['xo','lo'],
+  'ゃ':['xya','lya'], 'ゅ':['xyu','lyu'], 'ょ':['xyo','lyo'],
+  'っ':['xtsu','xtu','ltu','ltsu','っ'], // 促音
+  'ゎ':['xwa','lwa'],
+  'ー':'-', '　':' ', ' ':' '
+};
+
+function kanaToRomaji(str) {
+  // 2文字→1文字の順で変換
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    // 2文字の拗音・小書き対応
+    let two = str.slice(i, i+2);
+    if (kanaToRomajiMap[two]) {
+      let roma = kanaToRomajiMap[two];
+      if (Array.isArray(roma)) roma = roma[0];
+      result += roma;
+      i++;
+      continue;
+    }
+    // 促音「っ」→次の子音を重ねる
+    if (str[i] === 'っ' && i+1 < str.length) {
+      let next = str[i+1];
+      let roma = kanaToRomajiMap[str[i+1]];
+      if (roma) {
+        let c = Array.isArray(roma) ? roma[0][0] : roma[0];
+        result += c;
+        continue;
+      }
+    }
+    let roma = kanaToRomajiMap[str[i]];
+    if (Array.isArray(roma)) {
+      // つ/ツ/っ などは ["tsu","tu",...] で両方対応
+      result += roma[0];
+    } else if (str[i] === 'つ' || str[i] === 'ツ') {
+      result += 'tsu'; // デフォルト
+    } else {
+      result += roma || str[i];
+    }
   }
-  if (wordPool.length === 0) wordPool = words;
-  return wordPool[Math.floor(Math.random() * wordPool.length)];
+  // "tsu"→"tu"も許容するため、両方のパターンを返す
+  // ただしゲームロジック側で判定する場合は、入力と比較時に"tsu"→"tu"置換も許容
+  return result;
+}
+
+// 入力判定時に"tsu"→"tu"も許容（部分一致・複数表記対応に拡張・バックトラック型）
+function isRomajiMatch(input, answer) {
+  if (input === answer) return true;
+  // ローマ字分割候補テーブル
+  const romaTable = [
+    // 長い順に
+    ["kya","kyu","kyo"],["sha","shu","sho","sya","syu","syo"],["cha","chu","cho","cya","cyu","cyo","tya","tyu","tyo"],
+    ["nya","nyu","nyo"],["hya","hyu","hyo"],["mya","myu","myo"],["rya","ryu","ryo"],
+    ["gya","gyu","gyo"],["ja","ju","jo","jya","jyu","jyo","zya","zyu","zyo"],
+    ["bya","byu","byo"],["pya","pyu","pyo"],
+    ["tsu","tu"],["shi","si"],["chi","ti"],["fu","hu"],["ji","zi"],
+    ["nn","n"],
+    // 1文字
+    ["a"],["i"],["u"],["e"],["o"],["ka"],["ki"],["ku"],["ke"],["ko"],["sa"],["su"],["se"],["so"],["ta"],["te"],["to"],["na"],["ni"],["nu"],["ne"],["no"],["ha"],["hi"],["he"],["ho"],["ma"],["mi"],["mu"],["me"],["mo"],["ya"],["yu"],["yo"],["ra"],["ri"],["ru"],["re"],["ro"],["wa"],["wo"],["ga"],["gi"],["gu"],["ge"],["go"],["za"],["ji"],["zu"],["ze"],["zo"],["da"],["de"],["do"],["ba"],["bi"],["bu"],["be"],["bo"],["pa"],["pi"],["pu"],["pe"],["po"],["xa"],["xi"],["xu"],["xe"],["xo"],["xya"],["xyu"],["xyo"],["xwa"],["la"],["li"],["lu"],["le"],["lo"],["lya"],["lyu"],["lyo"],["lwa"],["xtsu"],["xtu"],["ltu"],["ltsu"]
+  ];
+  // answerをローマ字分割する再帰関数
+  function splitRomaji(str, pos = 0, path = []) {
+    if (pos === str.length) return [path];
+    let results = [];
+    for (const group of romaTable) {
+      for (const roma of group) {
+        if (str.startsWith(roma, pos)) {
+          results = results.concat(splitRomaji(str, pos + roma.length, path.concat(roma)));
+        }
+      }
+    }
+    return results;
+  }
+  // inputがanswerの分割パターンの先頭から一致するか
+  const patterns = splitRomaji(answer);
+  for (const ptn of patterns) {
+    let acc = '';
+    for (let i = 0; i < ptn.length; i++) {
+      acc += ptn[i];
+      if (input.length === acc.length && input === acc) return true;
+      // 途中一致も許容
+      if (input.startsWith(acc)) {
+        if (input.length <= acc.length) return true;
+      }
+    }
+    // 1文字ずつ比較（従来の部分一致も残す）
+    if (input === ptn.join('').slice(0, input.length)) return true;
+  }
+  // ん→n（nnでなくてもOK）: input, answerともnを全て除去して一致ならOK
+  if (answer.includes('n')) {
+    if (input.replace(/n/g, '') === answer.replace(/n/g, '').slice(0, input.length)) return true;
+  }
+  return false;
+}
+
+function pickRandomWord() {
+  if (langMode === 'ja' && words_ja.length > 0) {
+    let wordPool = words_ja;
+    switch (selectedStage) {
+      case "field":
+        wordPool = wordPool.filter(w => w.ja.length <= 6 && !w.ja.includes(" "));
+        break;
+      case "cave":
+        wordPool = wordPool.filter(w => w.ja.length >= 7 && w.ja.length <= 10 && !w.ja.includes(" "));
+        break;
+      case "castle":
+        wordPool = wordPool.filter(w => (w.ja.length > 10 && !w.ja.includes(" ")) || w.ja.includes(" "));
+        break;
+      case "forest":
+        wordPool = wordPool.filter(w => /魔法|森|伝説|冒険|杖|塔|鍵|扉|秘密|光|闇|自然|精霊|魔力|魔法陣|予言|導き|旅|不思議|謎|魔女|魔王|勇者|剣|城|森|扉|鍵/i.test(w.ja));
+        break;
+      case "magma":
+        wordPool = wordPool.filter(w => /火|マグマ|溶岩|地底|ダンジョン|罠|熱|炎|燃|危険|最終|骨|闇|敵|力|不滅|蘇生|変身|達成|疑い|区別/i.test(w.ja));
+        break;
+      default:
+        // そのまま
+    }
+    if (wordPool.length === 0) wordPool = words_ja;
+    const picked = wordPool[Math.floor(Math.random() * wordPool.length)];
+    // ja/roma両方返す
+    return { ja: picked.ja, roma: picked.roma };
+  } else {
+    let wordPool = words;
+    switch (selectedStage) {
+      case "field":
+        wordPool = wordPool.filter(w => w.length <= 6 && !w.includes(" "));
+        break;
+      case "cave":
+        wordPool = wordPool.filter(w => w.length >= 7 && w.length <= 10 && !w.includes(" "));
+        break;
+      case "castle":
+        wordPool = wordPool.filter(w => (w.length > 10 && !w.includes(" ")) || w.includes(" "));
+        break;
+      case "forest":
+        wordPool = wordPool.filter(w => /magic|crystal|amulet|wind|element|sorcery|phantom|fortune|mystery|shelter|journey|forest|whisper|enchanted|circle|prophecy|wizard|staff|spellbook|stranger|guidance|passage|legendary|enchanted|tower|key|secret|door/i.test(w));
+        break;
+      case "magma":
+        wordPool = wordPool.filter(w => /fire|magma|lava|underground|dungeon|trap|heat|flame|burn|danger|final|bone|dark|enemy|power|unbreakable|invincibility|resurrection|transformation|accomplishment|unquestionability|indistinguishable/i.test(w));
+        break;
+      default:
+        // そのまま
+    }
+    if (wordPool.length === 0) wordPool = words;
+    return wordPool[Math.floor(Math.random() * wordPool.length)];
+  }
 }
 
 // --- ステージ・敵管理 ---
@@ -212,6 +373,10 @@ function updateLiveFeedback() {
       result += `<span>${word[i]}</span>`;
     }
   }
+  // 日本語モード時は日本語表記も表示
+  if (langMode === 'ja' && window.currentJaWord) {
+    result = `<span class='ja-word'>${window.currentJaWord}</span><br><span class='roma-word'>${result}</span>`;
+  }
   document.getElementById("word").innerHTML = result;
 }
 
@@ -242,7 +407,12 @@ function startBattle(isNewBattle = false) {
   isTurnFinished = false;
   // タイマー調整
   const minTime = 3, maxTime = 20, baseTimePerChar = currentEnemy.timePerChar || 1.0;
-  timer = Math.min(maxTime, Math.max(minTime, Math.ceil(processedWord.length * baseTimePerChar)));
+  let timeBaseLength = processedWord.length;
+  if (langMode === 'ja' && window.currentJaWord) {
+    // 日本語モード時はローマ字の長さで計算
+    timeBaseLength = word.length;
+  }
+  timer = Math.min(maxTime, Math.max(minTime, Math.ceil(timeBaseLength * baseTimePerChar)));
   updateHPDisplay();
   updateLiveFeedback();
   const inputField = document.getElementById("input");
@@ -257,6 +427,9 @@ function startBattle(isNewBattle = false) {
   if (isNewBattle) {
     let countdown = 3;
     document.getElementById("countdown").textContent = countdown;
+    // カウントダウン中はお題・日本語表記を非表示
+    document.getElementById("word").innerHTML = "";
+    window.currentJaWord = null;
     countdownInterval = setInterval(() => {
       countdown--;
       if (countdown > 0) {
@@ -267,10 +440,23 @@ function startBattle(isNewBattle = false) {
         clearInterval(countdownInterval);
         document.getElementById("countdown").textContent = "";
         // カウントダウン終了時にお題・タイマーを表示
-        word = pickRandomWord();
-        processedWord = word.toLowerCase().replace(/ /g, "");
-        const minTime = 3, maxTime = 20, baseTimePerChar = currentEnemy.timePerChar || 1.0;
-        timer = Math.min(maxTime, Math.max(minTime, Math.ceil(processedWord.length * baseTimePerChar)));
+        let picked = pickRandomWord();
+        if (langMode === 'ja' && picked && typeof picked === 'object' && picked.ja && picked.roma) {
+          word = picked.roma;
+          console.log(`Picked word: ${picked.ja} (${picked.roma})`);
+          processedWord = word.toLowerCase().replace(/ /g, "");
+          window.currentJaWord = picked.ja; // 日本語表記も保持
+        } else {
+          word = typeof picked === 'string' ? picked : '';
+          processedWord = word.toLowerCase().replace(/ /g, "");
+          window.currentJaWord = null;
+        }
+        // タイマー再設定
+        let timeBaseLength2 = processedWord.length;
+        if (langMode === 'ja' && window.currentJaWord) {
+          timeBaseLength2 = word.length;
+        }
+        timer = Math.min(maxTime, Math.max(minTime, Math.ceil(timeBaseLength2 * baseTimePerChar)));
         updateLiveFeedback();
         inputField.disabled = false;
         inputField.focus();
@@ -279,10 +465,21 @@ function startBattle(isNewBattle = false) {
     }, 1000);
   } else {
     // 通常ターン開始時もお題・タイマーを表示
-    word = pickRandomWord();
-    processedWord = word.toLowerCase().replace(/ /g, "");
-    const minTime = 3, maxTime = 20, baseTimePerChar = currentEnemy.timePerChar || 1.0;
-    timer = Math.min(maxTime, Math.max(minTime, Math.ceil(processedWord.length * baseTimePerChar)));
+    let picked = pickRandomWord();
+    if (langMode === 'ja' && picked && typeof picked === 'object' && picked.ja && picked.roma) {
+      word = picked.roma;
+      processedWord = word.toLowerCase().replace(/ /g, "");
+      window.currentJaWord = picked.ja;
+    } else {
+      word = typeof picked === 'string' ? picked : '';
+      processedWord = word.toLowerCase().replace(/ /g, "");
+      window.currentJaWord = null;
+    }
+    let timeBaseLength3 = processedWord.length;
+    if (langMode === 'ja' && window.currentJaWord) {
+      timeBaseLength3 = word.length;
+    }
+    timer = Math.min(maxTime, Math.max(minTime, Math.ceil(timeBaseLength3 * baseTimePerChar)));
     updateLiveFeedback();
     inputField.disabled = false;
     inputField.focus();
@@ -291,18 +488,28 @@ function startBattle(isNewBattle = false) {
   inputField.oninput = handleInput;
 }
 
+// processedInputがprocessedWordの先頭からどこまで一致しているか（ローマ字バリエーション考慮）
+function getRomajiMatchLength(input, answer) {
+  if (!input) return 0;
+  let len = 0;
+  for (let i = 0; i < input.length && i < answer.length; i++) {
+    if (input[i] === answer[i]) len++;
+    else break;
+  }
+  return len;
+}
+
 function handleInput(e) {
   if (isTurnFinished) return;
   const rawInput = e.target.value;
   const processedInput = rawInput.toLowerCase().replace(/ /g, "");
-  if (processedInput.length < currentIndex) return;
-  const expectedChar = processedWord[currentIndex];
-  const typedChar = processedInput[currentIndex];
-  if (typedChar === expectedChar) {
-    currentIndex++;
-  } else {
+  // 最大一致長を探索
+  const matchLen = getRomajiMatchLength(processedInput, processedWord);
+  currentIndex = matchLen;
+  if (processedInput.length > matchLen) {
+    // ミスタイプ時
     missCount++;
-    showMissEffect(); // ミスタイプ時にエフェクト表示
+    showMissEffect();
   }
   updateLiveFeedback();
   const maxDisplayIndex = getWordIndex(currentIndex - 1);
@@ -600,6 +807,14 @@ window.addEventListener('DOMContentLoaded', async function () {
       startBattle(true);
       nextBattleBtn.style.display = "none";
     };
+  }
+  // 言語切替セレクトボックス
+  const langSelect = document.getElementById('langSelect');
+  if (langSelect) {
+    langSelect.value = langMode;
+    langSelect.addEventListener('change', function () {
+      langMode = langSelect.value;
+    });
   }
 });
 
