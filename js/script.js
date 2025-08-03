@@ -5,9 +5,10 @@ let enemies = [];
 const stages = {
   field: { name: "草原", start: 0, end: 4 },
   cave: { name: "洞窟", start: 4, end: 9 },
-  forest: { name: "魔法の森", start: 0, end: 0 }, // 新ステージ1
-  magma: { name: "マグマの地下ダンジョン", start: 0, end: 0 }, // 旧: tower → 新: magma
-  castle: { name: "魔王の城", start: 9, end: enemies.length } // 魔王の城を最後に
+  forest: { name: "魔法の森", start: 0, end: 0 },
+  magma: { name: "マグマの地下ダンジョン", start: 0, end: 0 },
+  castle: { name: "魔王の城", start: 9, end: enemies.length },
+  secret: { name: "裏ダンジョン", start: 0, end: 0 } // 隠しステージ
 };
 
 // --- ゲーム状態 ---
@@ -107,6 +108,9 @@ function setStage(stageKey) {
   if (stageKey === 'castle') {
     // 魔王の城は魔王のみ出現
     stageEnemies = candidates.filter(e => e.name === '魔王');
+  } else if (stageKey === 'secret') {
+    // 隠しステージ: 裏ボスのみ出現
+    stageEnemies = candidates.filter(e => e.stage === 'secret');
   } else {
     stageEnemies = candidates.length > 5 ? shuffleArray(candidates).slice(0, 5) : candidates;
   }
@@ -127,6 +131,8 @@ function setStage(stageKey) {
         bgPath = 'img/bg-magma.jpg'; break;
       case 'castle':
         bgPath = 'img/bg-castle.jpg'; break;
+      case 'secret':
+        bgPath = 'img/bg-secret.jpg'; break;
       default:
         bgPath = '';
     }
@@ -498,7 +504,6 @@ function loadPlayerStatus() {
 window.addEventListener('DOMContentLoaded', async function () {
   loadPlayerStatus();
   await loadGameData();
-  // 画面初期化: ステージ選択画面のみ表示
   showScreen('stage');
   // ステージ選択ボタンにイベント
   document.querySelectorAll('.stage-select-btn').forEach(btn => {
@@ -514,6 +519,21 @@ window.addEventListener('DOMContentLoaded', async function () {
       updateStatusDisplay();
       showScreen('battle');
     });
+  });
+  // --- 隠しステージ解放用 ---
+  let secretInput = '';
+  document.addEventListener('keydown', function(e) {
+    if (document.getElementById('stageSelectScreen').style.display !== 'block') return;
+    if (e.key.length === 1) {
+      secretInput += e.key;
+      if (secretInput.length > 20) secretInput = secretInput.slice(-20);
+      if (secretInput.toLowerCase().includes('secretstage')) {
+        const secretBtn = document.getElementById('secretStageBtn');
+        if (secretBtn) secretBtn.style.display = 'inline-block';
+      }
+    } else if (e.key === 'Backspace') {
+      secretInput = secretInput.slice(0, -1);
+    }
   });
   // 戻るボタンでステージ選択画面に遷移
   const backBtn = document.getElementById('backToStageBtn');
@@ -597,7 +617,7 @@ function updateEnemyDisplay() {
   // 敵の名前表示（パネル内）
   const enemyPanel = document.querySelector('.enemy-panel .status-title');
   if (enemyPanel && currentEnemy) {
-    enemyPanel.textContent = `敵：${currentEnemy.name}`;
+    enemyPanel.textContent = `${currentEnemy.name}`;
   } else if (enemyPanel) {
     enemyPanel.textContent = '敵';
   }
