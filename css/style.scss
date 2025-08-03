@@ -12,6 +12,30 @@ body {
   justify-content: center;
   background-image: url(../img/bg01.jpg);
   height: 100vh;
+  background-size: cover;
+  background-position: center;
+
+  &.shake {
+    animation: shake 0.18s cubic-bezier(.36, .07, .19, .97) 1 both;
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  30% {
+    transform: translateX(-1px);
+  }
+
+  60% {
+    transform: translateX(1px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 #enemy {
@@ -297,7 +321,7 @@ body {
   border: 3px solid #ffe066;
   border-radius: 16px;
   color: #fffbe6;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
   padding: 32px 28px 28px 28px;
   text-align: center;
   font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
@@ -316,7 +340,7 @@ body {
   font-weight: bold;
   border: 2.5px solid #bfa940;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13);
   padding: 16px 44px;
   letter-spacing: 2px;
   cursor: pointer;
@@ -324,16 +348,19 @@ body {
   outline: none;
   margin-top: 18px;
 }
-#endingToTitleBtn:hover, #endingToTitleBtn:focus {
+
+#endingToTitleBtn:hover,
+#endingToTitleBtn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
   transform: translateY(-2px) scale(1.04);
 }
+
 #endingToTitleBtn:active {
   background: #ffd700;
   color: #bfa940;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
   transform: scale(0.98);
 }
 
@@ -374,7 +401,7 @@ h1 {
   font-weight: bold;
   border: 2.5px solid #bfa940;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13);
   padding: 18px 36px;
   letter-spacing: 2px;
   cursor: pointer;
@@ -382,16 +409,53 @@ h1 {
   outline: none;
 }
 
-.stage-select-btn:hover, .stage-select-btn:focus {
+.stage-select-btn:hover,
+.stage-select-btn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
   transform: translateY(-2px) scale(1.04);
 }
 
 .stage-select-btn:active {
   background: #ffd700;
   color: #bfa940;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
   transform: scale(0.98);
+}
+
+.missEffect {
+  position: absolute;
+  z-index: 1000;
+  color: #ff4444;
+  font-size: 2.2rem;
+  font-weight: bold;
+  pointer-events: none;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: opacity 0.4s, transform 0.4s;
+  text-shadow: 0 0 8px #fff, 0 0 2px #ff4444;
+  animation: missPop 0.3s cubic-bezier(.7, -0.2, .7, 1.5);
+}
+
+@keyframes missPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+  }
+
+  80% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.missEffect.fadeout {
+  opacity: 0;
+  transform: scale(1.1) translateY(-18px);
 }

@@ -302,6 +302,7 @@ function handleInput(e) {
     currentIndex++;
   } else {
     missCount++;
+    showMissEffect(); // ミスタイプ時にエフェクト表示
   }
   updateLiveFeedback();
   const maxDisplayIndex = getWordIndex(currentIndex - 1);
@@ -310,6 +311,20 @@ function handleInput(e) {
   if (currentIndex === processedWord.length) finishTurn();
 }
 
+// ミスタイプ時のエフェクト表示
+function showMissEffect() {
+  const container = document.querySelector('.container');
+  if (!container) return;
+  container.classList.remove('shake'); // 連続ミス時のため一度外す
+  // 強制再描画でアニメーションをリセット
+  void container.offsetWidth;
+  container.classList.add('shake');
+  setTimeout(() => {
+    container.classList.remove('shake');
+  }, 400);
+}
+
+// タイマー関連の処理
 function startTimer() {
   isTimeout = false;
   const timerDisplay = document.getElementById("timer");
@@ -326,6 +341,7 @@ function startTimer() {
   }, 1000);
 }
 
+//ターン終了処理
 function finishTurn() {
   if (isTurnFinished) return;
   isTurnFinished = true;
