@@ -72,8 +72,8 @@
 
       <div class="btn-area">
         <div class="flex-center">
-          <button id="startBtn" onclick="startBattle(true)">バトル開始</button>
-          <button id="nextBattleBtn" style="display: none" onclick="startBattle(true)">次のバトルへ</button>
+          <button id="startBtn">バトル開始</button>
+          <button id="nextBattleBtn" style="display: none">次のバトルへ</button>
           <button id="backToStageBtn" type="button">ステージ選択に戻る</button>
         </div>
       </div>
@@ -99,7 +99,14 @@
 
   </div>
 
-  <script src="./js/script.js"></script>
+  <!-- JavaScript modules in dependency order -->
+  <script src="./js/utils/utils.js"></script>
+  <script src="./js/core/GameState.js"></script>
+  <script src="./js/core/GameData.js"></script>
+  <script src="./js/systems/RomajiSystem.js"></script>
+  <script src="./js/systems/UISystem.js"></script>
+  <script src="./js/systems/BattleSystem.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 
 </html>
