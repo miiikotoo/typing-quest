@@ -6,9 +6,9 @@ class RomajiSystem {
       'あ':'a','い':'i','う':'u','え':'e','お':'o',
       'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
       'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
-      'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+      'た':'ta','ち':['chi','ti'],'つ':['tsu','tu'],'て':'te','と':'to',
       'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
-      'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
+      'は':'ha','ひ':'hi','ふ':['fu','hu'],'へ':'he','ほ':'ho',
       'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
       'や':'ya','ゆ':'yu','よ':'yo',
       'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
@@ -133,12 +133,47 @@ class RomajiSystem {
   // processedInputがprocessedWordの先頭からどこまで一致しているか（ローマ字バリエーション考慮）
   getRomajiMatchLength(input, answer) {
     if (!input) return 0;
-    let len = 0;
-    for (let i = 0; i < input.length && i < answer.length; i++) {
-      if (input[i] === answer[i]) len++;
+    
+    let maxMatchLength = 0;
+    
+    for (let answerPos = 0; answerPos < answer.length; answerPos++) {
+      for (const group of this.romaTable) {
+        for (const roma of group) {
+          if (answer.startsWith(roma, answerPos)) {
+            for (const alternative of group) {
+              if (input.startsWith(alternative)) {
+                const matchLen = Math.min(alternative.length, input.length);
+                if (input.substr(0, matchLen) === alternative.substr(0, matchLen)) {
+                  const remainingInput = input.substr(alternative.length);
+                  const remainingAnswer = answer.substr(answerPos + roma.length);
+                  const remainingMatch = remainingInput.length > 0 ? 
+                    this.getRomajiMatchLength(remainingInput, remainingAnswer) : 0;
+                  
+                  const totalMatch = roma.length + remainingMatch;
+                  maxMatchLength = Math.max(maxMatchLength, totalMatch);
+                  
+                  if (alternative.length > input.length) {
+                    maxMatchLength = Math.max(maxMatchLength, roma.length * (input.length / alternative.length));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      if (answerPos === 0) continue;
       else break;
     }
-    return len;
+    
+    if (maxMatchLength === 0) {
+      for (let i = 0; i < input.length && i < answer.length; i++) {
+        if (input[i] === answer[i]) maxMatchLength++;
+        else break;
+      }
+    }
+    
+    return Math.floor(maxMatchLength);
   }
 
   // 単語内の位置計算ヘルパー
