@@ -1,0 +1,35 @@
+// 変数定義
+$font-base: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+$font-cinzel: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+
+// カラーパレット
+$color-primary: #ffe066;
+$color-primary-dark: #ffd700;
+$color-primary-light: #fffbe6;
+$color-secondary: #6ec6ff;
+$color-danger: #ff7675;
+$color-danger-dark: #d63031;
+$color-warning: #ff4200;
+$color-success: #00b894;
+
+// ダークテーマカラー
+$bg-dark: #232323;
+$bg-panel: #222;
+$text-light: #fff;
+$text-muted: #888;
+
+// サイズ
+$border-radius-sm: 10px;
+$border-radius-md: 12px;
+$border-radius-lg: 14px;
+$border-radius-xl: 16px;
+
+// シャドウ
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 6px 24px rgba(0, 0, 0, 0.22);
+
+// トランジション
+$transition-base: 0.2s ease;
+$transition-fast: 0.1s ease;
+$transition-slow: 0.3s ease;

@@ -1,0 +1,20 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap");
+
+// Base - 基本設定・変数・ミックスイン
+@import 'scss/base/variables';
+@import 'scss/base/mixins';
+@import 'scss/base/base';
+
+// Layout - レイアウト関連
+@import 'scss/layout/container';
+@import 'scss/layout/battle';
+
+// Components - UIコンポーネント
+@import 'scss/components/typography';
+@import 'scss/components/status';
+@import 'scss/components/battle-log';
+@import 'scss/components/buttons';
+@import 'scss/components/language-toggle';
+@import 'scss/components/forms';
+@import 'scss/components/effects';

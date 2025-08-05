@@ -1,0 +1,46 @@
+// ステータスパネル
+.status-panels {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.status-panel {
+  background: $bg-panel;
+  border: 3px solid #c9b87a;
+  border-radius: $border-radius-md;
+  color: $text-light;
+  min-width: 220px;
+  padding: 16px 20px 12px 20px;
+  box-shadow: $shadow-md;
+  font-family: $font-base;
+
+  &.player-panel {
+    border-color: $color-secondary;
+  }
+
+  &.enemy-panel {
+    border-color: $color-danger;
+  }
+}
+
+.status-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+  color: $text-light;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.status-hp {
+  font-size: 18px;
+  margin-top: 6px;
+}
+
+.status-name {
+  font-size: 18px;
+  margin-bottom: 4px;
+  color: #ffb347;
+}

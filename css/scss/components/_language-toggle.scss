@@ -1,0 +1,93 @@
+// 言語切り替えトグルボタン
+.language-toggle-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.language-toggle {
+  position: relative;
+}
+
+.language-toggle-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #e8f4fd 0%, #d1e7dd 100%);
+  border: 2px solid #6c757d;
+  border-radius: 25px;
+  padding: 0;
+  cursor: pointer;
+  transition: all $transition-slow;
+  outline: none;
+  overflow: hidden;
+  width: 200px;
+  height: 40px;
+
+  &:hover {
+    border-color: #495057;
+    box-shadow: $shadow-sm;
+  }
+
+  // 日本語選択時
+  &[data-lang="ja"] {
+    .toggle-option[data-lang="ja"] {
+      color: $text-light;
+      font-weight: bold;
+    }
+
+    .toggle-option[data-lang="en"] {
+      color: #6c757d;
+    }
+
+    .toggle-slider {
+      transform: translateX(0);
+    }
+  }
+
+  // 英語選択時
+  &[data-lang="en"] {
+    .toggle-option[data-lang="ja"] {
+      color: #6c757d;
+    }
+
+    .toggle-option[data-lang="en"] {
+      color: $text-light;
+      font-weight: bold;
+    }
+
+    .toggle-slider {
+      transform: translateX(100%);
+    }
+  }
+}
+
+.toggle-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #6c757d;
+  transition: all $transition-slow;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+  border-radius: 21px;
+  transition: transform $transition-slow;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}

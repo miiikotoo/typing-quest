@@ -1,0 +1,33 @@
+// タイトル
+h1 {
+  font-family: $font-cinzel;
+  font-size: 2.8rem;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  color: $color-primary-light;
+  text-shadow: 0 2px 8px #bfa940, 0 0 2px $text-light, 2px 2px 0 #bfa940, 0 0 24px #ffe06699;
+  background: linear-gradient(90deg, $color-primary 0%, $color-primary-dark 40%, $color-primary-light 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 18px;
+  padding: 8px 0 10px 0;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.18));
+}
+
+// エンディングメッセージ
+.ending-message {
+  background: rgba(35, 35, 35, 0.93);
+  border: 3px solid $color-primary;
+  border-radius: $border-radius-xl;
+  color: $color-primary-light;
+  box-shadow: $shadow-lg;
+  padding: 32px 28px 28px 28px;
+  text-align: center;
+  font-family: $font-cinzel;
+  font-size: 1.35rem;
+  margin-bottom: 32px;
+  margin-top: 18px;
+  letter-spacing: 1.2px;
+  line-height: 2.1;
+}

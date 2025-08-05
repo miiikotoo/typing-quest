@@ -1,0 +1,61 @@
+// バトルエリア
+.battle-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  min-width: 220px;
+  max-width: 600px;
+  min-height: 40px;
+  background: $bg-dark;
+  border-radius: $border-radius-sm;
+  border: 2.5px solid $text-light;
+  margin: 0 auto;
+  padding: 20px 15px;
+
+  #question {
+    min-height: 40px;
+    color: $text-light;
+    font-size: 24px;
+    font-family: $font-base;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 224, 102, 0.33);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    .correct {
+      color: blue;
+    }
+
+    .underline {
+      border-bottom: 2px solid blue;
+    }
+  }
+
+  #timer {
+    min-height: 40px;
+    color: $color-secondary;
+    font-size: 20px;
+    font-family: $font-base;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px #000, 0 0 8px rgba(110, 198, 255, 0.33);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  #countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: $text-light;
+    font-size: 32px;
+  }
+}

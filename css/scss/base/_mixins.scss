@@ -1,0 +1,33 @@
+// ボタンスタイル共通設定
+%btn-base {
+  font-family: $font-base;
+  font-weight: bold;
+  border-radius: $border-radius-md;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background $transition-base, box-shadow $transition-base, transform $transition-fast;
+  outline: none;
+
+  &:disabled {
+    background: #ccc !important;
+    color: $text-muted !important;
+    border-color: #bbb !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+// ホバーエフェクト
+%hover-lift {
+  &:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.04);
+  }
+}
+
+// アクティブエフェクト
+%active-press {
+  &:active {
+    transform: scale(0.98);
+  }
+}

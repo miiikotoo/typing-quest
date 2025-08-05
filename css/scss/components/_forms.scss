@@ -1,0 +1,26 @@
+// 入力フィールド
+#input {
+  position: absolute;
+  left: -9999px; // 入力欄は画面外に隠す
+}
+
+// 入力注意文・警告
+#inputNotice {
+  color: $color-warning;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#zenkakuWarning {
+  color: red;
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: none;
+}
+
+// 敵表示
+#enemy {
+  display: none;
+  font-size: 24px;
+  font-weight: bold;
+}
