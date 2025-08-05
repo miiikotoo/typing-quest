@@ -22,13 +22,15 @@
         <div class="status-exp">EXP: <span id="playerExp_stage">0</span> / <span id="nextExp_stage">20</span></div>
       </div>
 
-      <!-- 言語切替セレクトボックス -->
-      <div style="margin-bottom: 18px;">
-        <label for="langSelect" style="font-weight:bold;">出題言語：</label>
-        <select id="langSelect">
-          <option value="ja">日本語</option>
-          <option value="en">英語</option>
-        </select>
+      <!-- 言語切替トグルボタン -->
+      <div class="language-toggle-area" style="margin-bottom: 18px;">
+        <div class="language-toggle">
+          <button id="langToggleBtn" class="language-toggle-btn" data-lang="ja">
+            <span class="toggle-option" data-lang="ja">JP</span>
+            <span class="toggle-option" data-lang="en">EN</span>
+            <div class="toggle-slider"></div>
+          </button>
+        </div>
       </div>
 
       <div class="stage-select-area">

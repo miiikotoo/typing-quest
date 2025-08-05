@@ -185,11 +185,21 @@ class TypingQuest {
   }
 
   setupLanguageSelector() {
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) {
-      langSelect.value = this.gameState.langMode;
-      langSelect.addEventListener('change', () => {
-        this.gameState.langMode = langSelect.value;
+    const langToggleBtn = document.getElementById('langToggleBtn');
+    if (langToggleBtn) {
+      // 初期状態を設定
+      langToggleBtn.setAttribute('data-lang', this.gameState.langMode);
+      
+      // クリックイベントでトグル
+      langToggleBtn.addEventListener('click', () => {
+        const currentLang = langToggleBtn.getAttribute('data-lang');
+        const newLang = currentLang === 'ja' ? 'en' : 'ja';
+        
+        // UI更新
+        langToggleBtn.setAttribute('data-lang', newLang);
+        
+        // ゲーム状態更新
+        this.gameState.langMode = newLang;
         console.log(`言語モードを${this.gameState.langMode}に変更`);
       });
     }

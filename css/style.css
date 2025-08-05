@@ -56,16 +56,13 @@ body {
   border: 2.5px solid #fff;
   margin: 0 auto;
   padding: 20px 15px;
-  /* お題表示（RPG風デザイン） */
-  /* 残り時間表示 */
-  /* カウントダウン表示 */
 }
 
 .battle-area #question {
   min-height: 40px;
   color: #fff;
   font-size: 24px;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-weight: bold;
   letter-spacing: 1.5px;
   text-shadow: 1px 1px 2px #000, 0 0 8px rgba(255, 224, 102, 0.33);
@@ -87,7 +84,7 @@ body {
   min-height: 40px;
   color: #6ec6ff;
   font-size: 20px;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-weight: bold;
   text-shadow: 1px 1px 2px #000, 0 0 8px rgba(110, 198, 255, 0.33);
   display: flex;
@@ -108,17 +105,14 @@ body {
 #input {
   position: absolute;
   left: -9999px;
-  /* 入力欄は画面外に隠す */
 }
 
-/* 入力注意文（バトル前のみ） */
 #inputNotice {
   color: #ff4200;
   font-weight: bold;
   margin-bottom: 10px;
 }
 
-/* 全角警告（常時チェック） */
 #zenkakuWarning {
   color: red;
   font-weight: bold;
@@ -126,7 +120,6 @@ body {
   display: none;
 }
 
-/* ステータスウィンドウ風パネル */
 .status-panels {
   display: flex;
   justify-content: center;
@@ -142,7 +135,15 @@ body {
   min-width: 220px;
   padding: 16px 20px 12px 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
+}
+
+.status-panel.player-panel {
+  border-color: #6ec6ff;
+}
+
+.status-panel.enemy-panel {
+  border-color: #ff7675;
 }
 
 .status-title {
@@ -165,15 +166,6 @@ body {
   color: #ffb347;
 }
 
-.player-panel {
-  border-color: #6ec6ff;
-}
-
-.enemy-panel {
-  border-color: #ff7675;
-}
-
-/* バトルログ・メッセージウィンドウ */
 .battle-log {
   background: #222;
   border: 2px solid #ffe066;
@@ -183,13 +175,12 @@ body {
   margin: 20px auto 10px auto;
   padding: 10px 18px;
   font-size: 18px;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   text-align: left;
   white-space: pre-line;
   min-height: 10.5em;
   max-height: 10.5em;
-  /* 1行約1.05em×10行分 */
   overflow-y: auto;
 }
 
@@ -215,19 +206,32 @@ body {
   width: 100%;
 }
 
-#startBtn {
-  background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
-  color: #fff;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
-  font-size: 22px;
+#startBtn, #nextBattleBtn, #backToStageBtn, #endingToTitleBtn, .stage-select-btn {
+  font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-weight: bold;
-  border: 2.5px solid #b71c1c;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  padding: 12px 38px;
   letter-spacing: 2px;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  outline: none;
+}
+
+#startBtn:disabled, #nextBattleBtn:disabled, #backToStageBtn:disabled, #endingToTitleBtn:disabled, .stage-select-btn:disabled {
+  background: #ccc !important;
+  color: #888 !important;
+  border-color: #bbb !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+#startBtn {
+  background: linear-gradient(90deg, #ff7675 0%, #d63031 100%);
+  color: #fff;
+  font-size: 22px;
+  border: 2.5px solid #b71c1c;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  padding: 12px 38px;
 }
 
 #startBtn:hover:not(:disabled) {
@@ -237,29 +241,14 @@ body {
   transform: translateY(-2px) scale(1.04);
 }
 
-#startBtn:disabled {
-  background: #ccc;
-  color: #888;
-  border-color: #bbb;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
 #nextBattleBtn {
   background: linear-gradient(90deg, #6ec6ff 0%, #2196f3 100%);
   color: #fff;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
   font-size: 20px;
-  font-weight: bold;
   border: 2.5px solid #1976d2;
-  border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 12px 34px;
   margin: 18px 0 10px 0;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 #nextBattleBtn:hover:not(:disabled) {
@@ -269,28 +258,13 @@ body {
   transform: translateY(-2px) scale(1.04);
 }
 
-#nextBattleBtn:disabled {
-  background: #ccc;
-  color: #888;
-  border-color: #bbb;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
-}
-
 #backToStageBtn {
   background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
   color: #7c5c00;
-  font-family: 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
   font-size: 16px;
-  font-weight: bold;
   border: 2.5px solid #bfa940;
-  border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 10px 25px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 #backToStageBtn:hover:not(:disabled) {
@@ -298,15 +272,6 @@ body {
   color: #bfa940;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
   transform: translateY(-2px) scale(1.04);
-}
-
-#backToStageBtn:disabled {
-  background: #ccc;
-  color: #888;
-  border-color: #bbb;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
 }
 
 .ending-message {
@@ -317,7 +282,7 @@ body {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
   padding: 32px 28px 28px 28px;
   text-align: center;
-  font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "Cinzel", "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-size: 1.35rem;
   margin-bottom: 32px;
   margin-top: 18px;
@@ -328,22 +293,16 @@ body {
 #endingToTitleBtn {
   background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
   color: #7c5c00;
-  font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "Cinzel", "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-size: 1.18rem;
-  font-weight: bold;
   border: 2.5px solid #bfa940;
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13);
   padding: 16px 44px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  outline: none;
   margin-top: 18px;
 }
 
-#endingToTitleBtn:hover,
-#endingToTitleBtn:focus {
+#endingToTitleBtn:hover, #endingToTitleBtn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
@@ -358,7 +317,7 @@ body {
 }
 
 h1 {
-  font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "Cinzel", "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-size: 2.8rem;
   font-weight: bold;
   letter-spacing: 0.12em;
@@ -385,21 +344,15 @@ h1 {
 .stage-select-btn {
   background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
   color: #7c5c00;
-  font-family: 'Cinzel', 'serif', '游ゴシック', YuGothic, 'Meiryo', sans-serif;
+  font-family: "Cinzel", "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-size: 1.25rem;
-  font-weight: bold;
   border: 2.5px solid #bfa940;
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13);
   padding: 18px 36px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-  outline: none;
 }
 
-.stage-select-btn:hover,
-.stage-select-btn:focus {
+.stage-select-btn:hover, .stage-select-btn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
@@ -427,6 +380,11 @@ h1 {
   animation: missPop 0.3s cubic-bezier(0.7, -0.2, 0.7, 1.5);
 }
 
+.missEffect.fadeout {
+  opacity: 0;
+  transform: scale(1.1) translateY(-18px);
+}
+
 @keyframes missPop {
   0% {
     opacity: 0;
@@ -442,7 +400,89 @@ h1 {
   }
 }
 
-.missEffect.fadeout {
-  opacity: 0;
-  transform: scale(1.1) translateY(-18px);
+.language-toggle-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.language-toggle {
+  position: relative;
+}
+
+.language-toggle-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #e8f4fd 0%, #d1e7dd 100%);
+  border: 2px solid #6c757d;
+  border-radius: 25px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  overflow: hidden;
+  width: 200px;
+  height: 40px;
+}
+
+.language-toggle-btn:hover {
+  border-color: #495057;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.language-toggle-btn[data-lang="ja"] .toggle-option[data-lang="ja"] {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.language-toggle-btn[data-lang="ja"] .toggle-option[data-lang="en"] {
+  color: #6c757d;
+}
+
+.language-toggle-btn[data-lang="ja"] .toggle-slider {
+  transform: translateX(0);
+}
+
+.language-toggle-btn[data-lang="en"] .toggle-option[data-lang="ja"] {
+  color: #6c757d;
+}
+
+.language-toggle-btn[data-lang="en"] .toggle-option[data-lang="en"] {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.language-toggle-btn[data-lang="en"] .toggle-slider {
+  transform: translateX(100%);
+}
+
+.toggle-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  height: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  color: #6c757d;
+  transition: all 0.3s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
+  border-radius: 21px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
