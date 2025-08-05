@@ -39,11 +39,11 @@ class BattleSystem {
     }
 
     this.gameState.resetBattleState();
-    this.setupBattleTurn();
+    this.setupBattleTurn(isNewBattle);
   }
 
   // バトルターンセットアップ
-  setupBattleTurn() {
+  setupBattleTurn(isFirstTurn = false) {
     // タイマー調整
     const minTime = 3, maxTime = 20;
     const baseTimePerChar = this.gameState.currentEnemy.timePerChar || 1.0;
@@ -61,13 +61,16 @@ class BattleSystem {
     const inputField = this.uiSystem.setupInputField();
     this.uiSystem.hideNotice();
     
-    // カウントダウンまたは即座にお題表示
-    if (this.gameState.word === "") {
+    // 初回ターンのみカウントダウン表示、それ以外は即座に開始
+    if (isFirstTurn && this.gameState.word === "") {
       this.uiSystem.showCountdown(() => {
         this.setupWord();
         this.startInput();
       });
     } else {
+      if (this.gameState.word === "") {
+        this.setupWord();
+      }
       this.startInput();
     }
   }
@@ -78,7 +81,6 @@ class BattleSystem {
     
     if (this.gameState.langMode === 'ja' && picked && typeof picked === 'object' && picked.ja && picked.roma) {
       this.gameState.word = picked.roma;
-      console.log(`Picked word: ${picked.ja} (${picked.roma})`);
       this.gameState.processedWord = this.gameState.word.toLowerCase().replace(/ /g, "");
       window.currentJaWord = picked.ja; // 日本語表記も保持
     } else {
@@ -302,10 +304,10 @@ class BattleSystem {
   // バトル継続処理
   handleContinueBattle() {
     this.uiSystem.addBattleLog("次のターンへ…");
-    this.gameState.countdownInterval = setInterval(() => {
-      clearInterval(this.gameState.countdownInterval);
-      this.startBattle();
-    }, 2000);
+    // 次のターンは即座に開始（カウントダウンなし）
+    setTimeout(() => {
+      this.startBattle(false); // 継続ターンなのでfalse
+    }, 1000); // 短めの待機時間
   }
 }
 
