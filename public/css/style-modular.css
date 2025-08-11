@@ -1,6 +1,7 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap");
-#startBtn, #nextBattleBtn, #backToStageBtn, #endingToTitleBtn, .stage-select-btn, .debug-btn {
+.stage-select-btn,
+.debug-btn, #endingToTitleBtn, #backToStageBtn, #nextBattleBtn, #startBtn {
   font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-weight: bold;
   border-radius: 12px;
@@ -9,8 +10,8 @@
   transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
   outline: none;
 }
-
-#startBtn:disabled, #nextBattleBtn:disabled, #backToStageBtn:disabled, #endingToTitleBtn:disabled, .stage-select-btn:disabled, .debug-btn:disabled {
+.stage-select-btn:disabled,
+.debug-btn:disabled, #endingToTitleBtn:disabled, #backToStageBtn:disabled, #nextBattleBtn:disabled, #startBtn:disabled {
   background: #ccc !important;
   color: #888 !important;
   border-color: #bbb !important;
@@ -19,11 +20,13 @@
   transform: none !important;
 }
 
-#startBtn:hover:not(:disabled), #nextBattleBtn:hover:not(:disabled), #backToStageBtn:hover:not(:disabled), #endingToTitleBtn:hover:not(:disabled), .stage-select-btn:hover:not(:disabled), .debug-btn:hover:not(:disabled) {
+.stage-select-btn:hover:not(:disabled),
+.debug-btn:hover:not(:disabled), #endingToTitleBtn:hover:not(:disabled), #backToStageBtn:hover:not(:disabled), #nextBattleBtn:hover:not(:disabled), #startBtn:hover:not(:disabled) {
   transform: translateY(-2px) scale(1.04);
 }
 
-#endingToTitleBtn:active, .stage-select-btn:active, .debug-btn:active {
+.stage-select-btn:active,
+.debug-btn:active, #endingToTitleBtn:active {
   transform: scale(0.98);
 }
 
@@ -47,7 +50,6 @@ body {
     transform: translateX(0);
   }
 }
-
 @keyframes missPop {
   0% {
     opacity: 0;
@@ -62,7 +64,6 @@ body {
     transform: scale(1) translateY(0);
   }
 }
-
 .container {
   display: flex;
   flex-direction: column;
@@ -72,7 +73,6 @@ body {
   background-size: cover;
   background-position: center;
 }
-
 .container.shake {
   animation: shake 0.18s cubic-bezier(0.36, 0.07, 0.19, 0.97) 1 both;
 }
@@ -93,7 +93,6 @@ body {
   gap: 10px;
   margin-top: 20px;
 }
-
 .btn-area .flex-center {
   display: flex;
   flex-direction: column;
@@ -119,7 +118,6 @@ body {
   margin: 0 auto;
   padding: 20px 15px;
 }
-
 .battle-area #question {
   min-height: 40px;
   color: #fff;
@@ -133,15 +131,12 @@ body {
   justify-content: center;
   width: 100%;
 }
-
 .battle-area #question .correct {
   color: blue;
 }
-
 .battle-area #question .underline {
   border-bottom: 2px solid blue;
 }
-
 .battle-area #timer {
   min-height: 40px;
   color: #6ec6ff;
@@ -154,7 +149,6 @@ body {
   justify-content: center;
   width: 100%;
 }
-
 .battle-area #countdown {
   position: absolute;
   top: 50%;
@@ -170,7 +164,7 @@ h1 {
   font-weight: bold;
   letter-spacing: 0.12em;
   color: #fffbe6;
-  text-shadow: 0 2px 8px #bfa940, 0 0 2px #fff, 2px 2px 0 #bfa940, 0 0 24px #ffe06699;
+  text-shadow: 0 2px 8px #bfa940, 0 0 2px #fff, 2px 2px 0 #bfa940, 0 0 24px rgba(255, 224, 102, 0.6);
   background: linear-gradient(90deg, #ffe066 0%, #ffd700 40%, #fffbe6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -213,11 +207,9 @@ h1 {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
 }
-
 .status-panel.player-panel {
   border-color: #6ec6ff;
 }
-
 .status-panel.enemy-panel {
   border-color: #ff7675;
 }
@@ -259,7 +251,6 @@ h1 {
   max-height: 10.5em;
   overflow-y: auto;
 }
-
 .battle-log .critical {
   color: red;
   font-weight: bold;
@@ -273,7 +264,6 @@ h1 {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 12px 38px;
 }
-
 #startBtn:hover:not(:disabled) {
   background: linear-gradient(90deg, #ffeaea 0%, #ff7675 100%);
   color: #b71c1c;
@@ -289,7 +279,6 @@ h1 {
   padding: 12px 34px;
   margin: 18px 0 10px 0;
 }
-
 #nextBattleBtn:hover:not(:disabled) {
   background: linear-gradient(90deg, #e3f7ff 0%, #6ec6ff 100%);
   color: #1976d2;
@@ -304,7 +293,6 @@ h1 {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 10px 25px;
 }
-
 #backToStageBtn:hover:not(:disabled) {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
@@ -322,20 +310,19 @@ h1 {
   padding: 16px 44px;
   margin-top: 18px;
 }
-
 #endingToTitleBtn:hover, #endingToTitleBtn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
 }
-
 #endingToTitleBtn:active {
   background: #ffd700;
   color: #bfa940;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.stage-select-btn {
+.stage-select-btn,
+.debug-btn {
   background: linear-gradient(90deg, #ffe066 0%, #ffd700 100%);
   color: #7c5c00;
   font-family: "Cinzel", "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
@@ -345,14 +332,15 @@ h1 {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   padding: 18px 36px;
 }
-
-.stage-select-btn:hover, .stage-select-btn:focus {
+.stage-select-btn:hover, .stage-select-btn:focus,
+.debug-btn:hover,
+.debug-btn:focus {
   background: linear-gradient(90deg, #fffbe6 0%, #ffe066 100%);
   color: #bfa940;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
 }
-
-.stage-select-btn:active {
+.stage-select-btn:active,
+.debug-btn:active {
   background: #ffd700;
   color: #bfa940;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -385,35 +373,28 @@ h1 {
   width: 200px;
   height: 40px;
 }
-
 .language-toggle-btn:hover {
   border-color: #495057;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
-.language-toggle-btn[data-lang="ja"] .toggle-option[data-lang="ja"] {
+.language-toggle-btn[data-lang=ja] .toggle-option[data-lang=ja] {
   color: #fff;
   font-weight: bold;
 }
-
-.language-toggle-btn[data-lang="ja"] .toggle-option[data-lang="en"] {
+.language-toggle-btn[data-lang=ja] .toggle-option[data-lang=en] {
   color: #6c757d;
 }
-
-.language-toggle-btn[data-lang="ja"] .toggle-slider {
+.language-toggle-btn[data-lang=ja] .toggle-slider {
   transform: translateX(0);
 }
-
-.language-toggle-btn[data-lang="en"] .toggle-option[data-lang="ja"] {
+.language-toggle-btn[data-lang=en] .toggle-option[data-lang=ja] {
   color: #6c757d;
 }
-
-.language-toggle-btn[data-lang="en"] .toggle-option[data-lang="en"] {
+.language-toggle-btn[data-lang=en] .toggle-option[data-lang=en] {
   color: #fff;
   font-weight: bold;
 }
-
-.language-toggle-btn[data-lang="en"] .toggle-slider {
+.language-toggle-btn[data-lang=en] .toggle-slider {
   transform: translateX(100%);
 }
 
@@ -482,8 +463,9 @@ h1 {
   text-shadow: 0 0 8px #fff, 0 0 2px #ff4444;
   animation: missPop 0.3s ease cubic-bezier(0.7, -0.2, 0.7, 1.5);
 }
-
 .missEffect.fadeout {
   opacity: 0;
   transform: scale(1.1) translateY(-18px);
 }
+
+/*# sourceMappingURL=style-modular.css.map */
