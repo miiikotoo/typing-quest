@@ -17,6 +17,7 @@ class Utils {
   static showScreen(screen) {
     document.getElementById('stageSelectScreen').style.display = (screen === 'stage') ? 'block' : 'none';
     document.getElementById('battleScreen').style.display = (screen === 'battle') ? 'block' : 'none';
+    document.getElementById('debugScreen').style.display = (screen === 'debug') ? 'block' : 'none';
     const ending = document.getElementById('endingScreen');
     if (ending) ending.style.display = (screen === 'ending') ? 'block' : 'none';
   }

@@ -40,6 +40,7 @@
         <button class="stage-select-btn" data-stage="magma">地下神殿</button>
         <button class="stage-select-btn" data-stage="castle">魔王の城</button>
         <button class="stage-select-btn" id="secretStageBtn" data-stage="secret" style="display:none;">???</button>
+        <button class="debug-btn" id="debugBtn">デバッグ</button>
       </div>
     </div>
 
@@ -101,6 +102,74 @@
 
   </div>
 
+  <!-- デバッグ画面 -->
+  <div id="debugScreen" style="display:none;">
+    <h1>タイピングデバッグ</h1>
+    
+    <!-- テキスト選択エリア -->
+    <div class="debug-text-selection">
+      <div class="status-panel" style="max-width:600px;margin:0 auto 20px auto;">
+        <div class="status-title">練習テキスト選択</div>
+        
+        <!-- 言語切替 -->
+        <div class="language-toggle-area" style="margin-bottom: 18px;">
+          <div class="language-toggle">
+            <button id="debugLangToggleBtn" class="language-toggle-btn" data-lang="ja">
+              <span class="toggle-option" data-lang="ja">JP</span>
+              <span class="toggle-option" data-lang="en">EN</span>
+              <div class="toggle-slider"></div>
+            </button>
+          </div>
+        </div>
+        
+        <!-- 定型文選択 -->
+        <div style="margin-bottom: 15px;">
+          <label style="color: #fff; margin-bottom: 8px; display: block;">定型文から選択:</label>
+          <select id="debugWordSelect" style="width: 100%; padding: 8px; border-radius: 6px; border: 2px solid #c9b87a; background: #333; color: #fff;">
+            <option value="">選択してください</option>
+          </select>
+        </div>
+        
+        <!-- カスタムテキスト入力 -->
+        <div>
+          <label style="color: #fff; margin-bottom: 8px; display: block;">カスタムテキスト:</label>
+          <textarea id="debugCustomText" placeholder="練習したいテキストを入力してください" 
+                   style="width: 100%; height: 80px; padding: 8px; border-radius: 6px; border: 2px solid #c9b87a; background: #333; color: #fff; resize: vertical;"></textarea>
+        </div>
+        
+        <button id="debugStartBtn" class="stage-select-btn" style="margin-top: 15px;">練習開始</button>
+      </div>
+    </div>
+    
+    <!-- タイピング練習エリア -->
+    <div id="debugTypingArea" style="display:none;">
+      <div class="battle-area">
+        <div id="debugQuestion"><span id="debugWord"></span></div>
+        <div id="debugTimer"><span id="debugTime"></span></div>
+      </div>
+      
+      <input id="debugInput" type="text" autocomplete="off" style="position: absolute; left: -9999px;" />
+      
+      <!-- 結果表示 -->
+      <div id="debugResults" class="status-panel" style="max-width:600px;margin:20px auto;">
+        <div class="status-title">結果</div>
+        <div id="debugResultsContent" style="color: #fff;"></div>
+      </div>
+      
+      <div class="btn-area">
+        <div class="flex-center">
+          <button id="debugResetBtn" class="stage-select-btn">リセット</button>
+          <button id="debugBackBtn" class="stage-select-btn">テキスト選択に戻る</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 戻るボタン -->
+    <div class="btn-area" style="margin-top: 20px;">
+      <button id="debugBackToStageBtn" class="stage-select-btn">ステージ選択に戻る</button>
+    </div>
+  </div>
+
   <!-- JavaScript modules in dependency order -->
   <script src="./js/utils/utils.js"></script>
   <script src="./js/core/GameState.js"></script>
@@ -108,6 +177,7 @@
   <script src="./js/systems/RomajiSystem.js"></script>
   <script src="./js/systems/UISystem.js"></script>
   <script src="./js/systems/BattleSystem.js"></script>
+  <script src="./js/systems/DebugSystem.js"></script>
   <script src="./js/main.js"></script>
 </body>
 
