@@ -7,12 +7,10 @@ class TypingQuest {
     this.romajiSystem = new RomajiSystem();
     this.uiSystem = new UISystem();
     this.battleSystem = new BattleSystem();
-    this.debugSystem = new DebugSystem();
     
     // 相互参照の設定
     this.uiSystem.init(this.gameState, this.romajiSystem);
     this.battleSystem.init(this.gameState, this.gameData, this.romajiSystem, this.uiSystem);
-    this.debugSystem.init(this.gameData, this.romajiSystem);
     
     // グローバルアクセス用
     window.gameState = this.gameState;
@@ -20,7 +18,6 @@ class TypingQuest {
     window.romajiSystem = this.romajiSystem;
     window.uiSystem = this.uiSystem;
     window.battleSystem = this.battleSystem;
-    window.debugSystem = this.debugSystem;
   }
 
   async init() {

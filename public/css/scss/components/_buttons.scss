@@ -79,8 +79,7 @@
   }
 }
 
-.stage-select-btn,
-.debug-btn {
+.stage-select-btn {
   @extend %btn-base;
   @extend %hover-lift;
   @extend %active-press;
