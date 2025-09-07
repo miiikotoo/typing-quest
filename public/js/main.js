@@ -7,6 +7,7 @@ class TypingQuest {
     this.romajiSystem = new RomajiSystem();
     this.uiSystem = new UISystem();
     this.battleSystem = new BattleSystem();
+    this.audioSystem = new AudioSystem();
     
     // 相互参照の設定
     this.uiSystem.init(this.gameState, this.romajiSystem);
@@ -18,6 +19,7 @@ class TypingQuest {
     window.romajiSystem = this.romajiSystem;
     window.uiSystem = this.uiSystem;
     window.battleSystem = this.battleSystem;
+    window.audioSystem = this.audioSystem;
   }
 
   async init() {
@@ -26,6 +28,9 @@ class TypingQuest {
     try {
       // データ読み込み
       await this.gameData.loadData();
+      
+      // 音楽ファイル事前読み込み（オプション）
+      // this.audioSystem.preloadAllAudio();
       
       // セーブデータ読み込み
       this.gameState.load();
@@ -64,6 +69,9 @@ class TypingQuest {
     
     // 言語切り替え
     this.setupLanguageSelector();
+    
+    // 音楽設定
+    this.setupAudioSettings();
   }
 
   setupStageSelectButtons() {
@@ -201,6 +209,76 @@ class TypingQuest {
         // ゲーム状態更新
         this.gameState.langMode = newLang;
         console.log(`言語モードを${this.gameState.langMode}に変更`);
+      });
+    }
+  }
+
+  setupAudioSettings() {
+    // BGM切り替えボタン
+    const bgmToggleBtn = document.getElementById('bgmToggleBtn');
+    const bgmVolumeContainer = document.getElementById('bgmVolumeContainer');
+    if (bgmToggleBtn) {
+      const updateBGMToggle = (isEnabled) => {
+        bgmToggleBtn.setAttribute('data-enabled', isEnabled.toString());
+        if (bgmVolumeContainer) {
+          bgmVolumeContainer.classList.toggle('hidden', !isEnabled);
+        }
+      };
+
+      bgmToggleBtn.addEventListener('click', () => {
+        const isEnabled = this.audioSystem.toggleBGM();
+        updateBGMToggle(isEnabled);
+      });
+      
+      // 初期状態設定
+      updateBGMToggle(this.audioSystem.isBGMEnabled);
+    }
+
+    // SE切り替えボタン
+    const seToggleBtn = document.getElementById('seToggleBtn');
+    const seVolumeContainer = document.getElementById('seVolumeContainer');
+    if (seToggleBtn) {
+      const updateSEToggle = (isEnabled) => {
+        seToggleBtn.setAttribute('data-enabled', isEnabled.toString());
+        if (seVolumeContainer) {
+          seVolumeContainer.classList.toggle('hidden', !isEnabled);
+        }
+      };
+
+      seToggleBtn.addEventListener('click', () => {
+        const isEnabled = this.audioSystem.toggleSE();
+        updateSEToggle(isEnabled);
+      });
+      
+      // 初期状態設定
+      updateSEToggle(this.audioSystem.isSEEnabled);
+    }
+
+    // BGM音量スライダー
+    const bgmVolumeSlider = document.getElementById('bgmVolumeSlider');
+    const bgmVolumeDisplay = document.getElementById('bgmVolumeDisplay');
+    if (bgmVolumeSlider && bgmVolumeDisplay) {
+      bgmVolumeSlider.value = this.audioSystem.bgmVolume * 100;
+      bgmVolumeDisplay.textContent = `${Math.round(this.audioSystem.bgmVolume * 100)}%`;
+      
+      bgmVolumeSlider.addEventListener('input', (e) => {
+        const volume = e.target.value / 100;
+        this.audioSystem.setBGMVolume(volume);
+        bgmVolumeDisplay.textContent = `${Math.round(volume * 100)}%`;
+      });
+    }
+
+    // SE音量スライダー
+    const seVolumeSlider = document.getElementById('seVolumeSlider');
+    const seVolumeDisplay = document.getElementById('seVolumeDisplay');
+    if (seVolumeSlider && seVolumeDisplay) {
+      seVolumeSlider.value = this.audioSystem.seVolume * 100;
+      seVolumeDisplay.textContent = `${Math.round(this.audioSystem.seVolume * 100)}%`;
+      
+      seVolumeSlider.addEventListener('input', (e) => {
+        const volume = e.target.value / 100;
+        this.audioSystem.setSEVolume(volume);
+        seVolumeDisplay.textContent = `${Math.round(volume * 100)}%`;
       });
     }
   }

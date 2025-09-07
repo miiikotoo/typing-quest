@@ -16,6 +16,27 @@
   }
 }
 
+// 音楽設定ボタン
+.audio-toggle-btn {
+  @extend %btn-base;
+  background: linear-gradient(90deg, #4a5568 0%, #2d3748 100%);
+  color: $text-light;
+  font-size: 14px;
+  border: 1px solid #2d3748;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border-radius: 6px;
+
+  &:hover {
+    background: linear-gradient(90deg, #718096 0%, #4a5568 100%);
+  }
+
+  &.disabled {
+    background: linear-gradient(90deg, #e53e3e 0%, #c53030 100%);
+    opacity: 0.8;
+  }
+}
+
 #nextBattleBtn {
   @extend %btn-base;
   @extend %hover-lift;

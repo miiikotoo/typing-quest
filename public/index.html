@@ -33,6 +33,51 @@
         </div>
       </div>
 
+      <!-- 音楽設定 -->
+      <div class="audio-settings" style="margin-bottom: 18px; text-align: center;">
+        <!-- BGM設定 -->
+        <div class="audio-setting-item" style="margin-bottom: 12px;">
+          <div class="audio-toggle-container">
+            <span class="audio-label">BGM:</span>
+            <div class="audio-toggle">
+              <button id="bgmToggleBtn" class="audio-toggle-btn" data-enabled="true">
+                <span class="audio-toggle-option" data-state="on">ON</span>
+                <span class="audio-toggle-option" data-state="off">OFF</span>
+                <div class="toggle-slider"></div>
+              </button>
+            </div>
+          </div>
+          <div id="bgmVolumeContainer" class="volume-container" style="margin-top: 8px;">
+            <label style="font-size: 0.9rem;">
+              音量: 
+              <input type="range" id="bgmVolumeSlider" min="0" max="100" value="30" style="width: 100px;">
+              <span id="bgmVolumeDisplay">30%</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- SE設定 -->
+        <div class="audio-setting-item">
+          <div class="audio-toggle-container">
+            <span class="audio-label">SE:</span>
+            <div class="audio-toggle">
+              <button id="seToggleBtn" class="audio-toggle-btn" data-enabled="true">
+                <span class="audio-toggle-option" data-state="on">ON</span>
+                <span class="audio-toggle-option" data-state="off">OFF</span>
+                <div class="toggle-slider"></div>
+              </button>
+            </div>
+          </div>
+          <div id="seVolumeContainer" class="volume-container" style="margin-top: 8px;">
+            <label style="font-size: 0.9rem;">
+              音量: 
+              <input type="range" id="seVolumeSlider" min="0" max="100" value="50" style="width: 100px;">
+              <span id="seVolumeDisplay">50%</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div class="stage-select-area">
         <button class="stage-select-btn" data-stage="field">草原</button>
         <button class="stage-select-btn" data-stage="cave">洞窟</button>
@@ -107,6 +152,7 @@
   <script src="./js/core/GameData.js"></script>
   <script src="./js/systems/RomajiSystem.js"></script>
   <script src="./js/systems/UISystem.js"></script>
+  <script src="./js/systems/AudioSystem.js"></script>
   <script src="./js/systems/BattleSystem.js"></script>
   <script src="./js/main.js"></script>
 </body>

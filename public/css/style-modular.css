@@ -1,6 +1,6 @@
 @charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap");
-#startBtn, #nextBattleBtn, #backToStageBtn, #endingToTitleBtn, .stage-select-btn {
+#startBtn, .audio-toggle-btn, #nextBattleBtn, #backToStageBtn, #endingToTitleBtn, .stage-select-btn {
   font-family: "serif", "游ゴシック", YuGothic, "Meiryo", sans-serif;
   font-weight: bold;
   border-radius: 12px;
@@ -10,7 +10,7 @@
   outline: none;
 }
 
-#startBtn:disabled, #nextBattleBtn:disabled, #backToStageBtn:disabled, #endingToTitleBtn:disabled, .stage-select-btn:disabled {
+#startBtn:disabled, .audio-toggle-btn:disabled, #nextBattleBtn:disabled, #backToStageBtn:disabled, #endingToTitleBtn:disabled, .stage-select-btn:disabled {
   background: #ccc !important;
   color: #888 !important;
   border-color: #bbb !important;
@@ -280,6 +280,25 @@ h1 {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
 }
 
+.audio-toggle-btn {
+  background: linear-gradient(90deg, #4a5568 0%, #2d3748 100%);
+  color: #fff;
+  font-size: 14px;
+  border: 1px solid #2d3748;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border-radius: 6px;
+}
+
+.audio-toggle-btn:hover {
+  background: linear-gradient(90deg, #718096 0%, #4a5568 100%);
+}
+
+.audio-toggle-btn.disabled {
+  background: linear-gradient(90deg, #e53e3e 0%, #c53030 100%);
+  opacity: 0.8;
+}
+
 #nextBattleBtn {
   background: linear-gradient(90deg, #6ec6ff 0%, #2196f3 100%);
   color: #fff;
@@ -443,6 +462,140 @@ h1 {
   transition: transform 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
+}
+
+.audio-settings .audio-setting-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.audio-settings .audio-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.audio-settings .audio-label {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #fff;
+  min-width: 40px;
+}
+
+.audio-settings .audio-toggle {
+  position: relative;
+}
+
+.audio-settings .audio-toggle-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #e8f4fd 0%, #d1e7dd 100%);
+  border: 2px solid #6c757d;
+  border-radius: 25px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  overflow: hidden;
+  width: 96px;
+  height: 36px;
+}
+
+.audio-settings .audio-toggle-btn:hover {
+  border-color: #495057;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="true"] .audio-toggle-option[data-state="on"] {
+  color: #fff;
+  font-weight: bold;
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="true"] .audio-toggle-option[data-state="off"] {
+  color: #6c757d;
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="true"] .toggle-slider {
+  transform: translateX(0);
+  background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="false"] .audio-toggle-option[data-state="on"] {
+  color: #6c757d;
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="false"] .audio-toggle-option[data-state="off"] {
+  color: #fff;
+  font-weight: bold;
+}
+
+.audio-settings .audio-toggle-btn[data-enabled="false"] .toggle-slider {
+  transform: translateX(46px);
+  background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+}
+
+.audio-settings .audio-toggle-option {
+  position: relative;
+  z-index: 2;
+  width: 46px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-align: center;
+  line-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-settings .toggle-slider {
+  position: absolute;
+  top: 1px;
+  left: 0px;
+  width: 46px;
+  height: 32px;
+  background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+  border-radius: 23px;
+  transition: all 0.3s ease;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.audio-settings .volume-container {
+  transition: all 0.3s ease;
+  opacity: 1;
+  max-height: 50px;
+}
+
+.audio-settings .volume-container.hidden {
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin-top: 0 !important;
+}
+
+.audio-settings .volume-container label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.audio-settings .volume-container input[type="range"] {
+  accent-color: #28a745;
+  width: 120px;
+  height: 6px;
+}
+
+.audio-settings .volume-container span {
+  font-weight: bold;
+  min-width: 45px;
+  color: #ffe066;
+  text-align: right;
 }
 
 #input {

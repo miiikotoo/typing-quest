@@ -42,6 +42,14 @@ class GameState {
       this.playerATK += 1;
       this.playerHP = this.maxPlayerHP; // レベルアップ時に全回復
       this.nextExp = Math.floor(this.nextExp * 1.3 + 10); // 必要経験値も増加
+      
+      // レベルアップ効果音を少し遅延させて再生（enemyDefeatと重ならないように）
+      if (window.audioSystem) {
+        setTimeout(() => {
+          window.audioSystem.playSE('levelup');
+        }, 300); // 300ms遅延
+      }
+      
       window.uiSystem.addBattleLog(`<span class='levelup'>レベルが${this.playerLevel}に上がった！HPと攻撃力が上昇！</span>`);
       this.updateStatusDisplay();
       this.save();

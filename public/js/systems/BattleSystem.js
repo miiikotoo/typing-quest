@@ -18,6 +18,16 @@ class BattleSystem {
   startBattle(isNewBattle = false) {
     if (this.gameState.playerHP <= 0 || this.gameState.stageEnemies.length === 0) return;
     
+    // バトルBGM再生（ラスボス判定）
+    if (isNewBattle && window.audioSystem) {
+      // 魔王（ラスボス）の場合は専用BGMを再生
+      if (this.gameState.currentEnemy && this.gameState.currentEnemy.name === '魔王') {
+        window.audioSystem.playBossBattleBGM();
+      } else {
+        window.audioSystem.playBattleBGM();
+      }
+    }
+    
     // UI初期化
     this.uiSystem.showButtons({
       startBtn: false,
@@ -118,8 +128,20 @@ class BattleSystem {
     const processedInput = rawInput.toLowerCase().replace(/ /g, "");
     
     // 最大一致長を探索
+    const prevIndex = this.gameState.currentIndex;
     const matchLen = this.romajiSystem.getRomajiMatchLength(processedInput, this.gameState.processedWord);
     this.gameState.currentIndex = matchLen;
+    
+    // 効果音再生
+    if (window.audioSystem) {
+      if (matchLen > prevIndex) {
+        // 正解音
+        window.audioSystem.playSE('typeCorrect');
+      } else if (processedInput.length > matchLen) {
+        // ミス音
+        window.audioSystem.playSE('typeError');
+      }
+    }
     
     if (processedInput.length > matchLen) {
       // ミスタイプ時
@@ -202,6 +224,15 @@ class BattleSystem {
     this.gameState.enemyHP -= damageToEnemy;
     if (this.gameState.enemyHP < 0) this.gameState.enemyHP = 0;
     
+    // 攻撃効果音（クリティカル判定）
+    if (window.audioSystem) {
+      if (isCritical) {
+        window.audioSystem.playSE('attackCritical');
+      } else {
+        window.audioSystem.playSE('attack');
+      }
+    }
+    
     this.uiSystem.updateHPDisplay();
     
     if (isCritical) {
@@ -227,6 +258,11 @@ class BattleSystem {
     this.gameState.playerHP -= damageToPlayer;
     if (this.gameState.playerHP < 0) this.gameState.playerHP = 0;
     
+    // 被ダメージ効果音
+    if (window.audioSystem && damageToPlayer > 0) {
+      window.audioSystem.playSE('damage');
+    }
+    
     this.uiSystem.updateHPDisplay();
     this.uiSystem.logDamage(`${damageToPlayer}`, true);
   }
@@ -234,7 +270,11 @@ class BattleSystem {
   // バトル結果処理
   processBattleResult() {
     if (this.gameState.enemyHP <= 0 && this.gameState.playerHP > 0) {
-      // 勝利
+      // 勝利効果音
+      if (window.audioSystem) {
+        window.audioSystem.playSE('enemyDefeat');
+      }
+      
       this.uiSystem.addBattleLog(`${this.gameState.currentEnemy.name}を倒した！`);
       this.uiSystem.addBattleLog(`<span class='exp-gain'>経験値を${this.gameState.currentEnemy.exp}獲得！</span>`);
       this.gameState.gainExp(this.gameState.currentEnemy.exp);
@@ -247,6 +287,11 @@ class BattleSystem {
         this.handleNormalVictory();
       }
     } else if (this.gameState.playerHP <= 0) {
+      // 敗北効果音
+      if (window.audioSystem) {
+        window.audioSystem.playSE('gameOver');
+      }
+      
       // 敗北
       this.handleDefeat();
     } else {
@@ -257,6 +302,11 @@ class BattleSystem {
 
   // 特殊ボス撃破処理
   handleSpecialBossDefeat() {
+    // バトルBGM停止
+    if (window.audioSystem) {
+      window.audioSystem.stopBGM();
+    }
+    
     this.gameState.word = "";
     this.gameState.processedWord = "";
     document.getElementById("countdown").textContent = "";
@@ -276,6 +326,11 @@ class BattleSystem {
 
   // 通常勝利処理
   handleNormalVictory() {
+    // バトルBGM停止
+    if (window.audioSystem) {
+      window.audioSystem.stopBGM();
+    }
+    
     // 次の敵をランダム選出
     this.gameState.currentEnemy = this.gameState.stageEnemies[Math.floor(Math.random() * this.gameState.stageEnemies.length)];
     this.gameState.enemyHP = this.gameState.currentEnemy.maxHP;
@@ -291,6 +346,11 @@ class BattleSystem {
 
   // 敗北処理
   handleDefeat() {
+    // バトルBGM停止
+    if (window.audioSystem) {
+      window.audioSystem.stopBGM();
+    }
+    
     this.uiSystem.addBattleLog("あなたは力尽きた…");
     this.gameState.word = "";
     this.gameState.processedWord = "";
@@ -311,4 +371,5 @@ class BattleSystem {
   }
 }
 
-// グローバルに公開（main.jsで設定されるため、ここでは削除）
+// グローバルに公開
+window.BattleSystem = BattleSystem;
