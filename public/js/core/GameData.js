@@ -40,13 +40,13 @@ class GameData {
       
       switch (selectedStage) {
         case "field":
-          wordPool = wordPool.filter(w => w.ja.length <= 6 && !w.ja.includes(" "));
+          wordPool = wordPool.filter(w => w.roma.length <= 6 && !w.ja.includes(" "));
           break;
         case "cave":
-          wordPool = wordPool.filter(w => w.ja.length >= 7 && w.ja.length <= 10 && !w.ja.includes(" "));
+          wordPool = wordPool.filter(w => w.roma.length >= 7 && w.roma.length <= 10 && !w.ja.includes(" "));
           break;
         case "castle":
-          wordPool = wordPool.filter(w => (w.ja.length > 10 && !w.ja.includes(" ")) || w.ja.includes(" "));
+          wordPool = wordPool.filter(w => (w.roma.length > 10 && !w.ja.includes(" ")) || w.ja.includes(" "));
           break;
         case "forest":
           wordPool = wordPool.filter(w => /魔法|森|伝説|冒険|杖|塔|鍵|扉|秘密|光|闇|自然|精霊|魔力|魔法陣|予言|導き|旅|不思議|謎|魔女|魔王|勇者|剣|城|森|扉|鍵/i.test(w.ja));
