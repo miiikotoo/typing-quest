@@ -329,9 +329,7 @@ class BattleSystem {
     
     if (this.gameState.currentEnemy.name === '魔王') {
       this.uiSystem.addBattleLog("魔王を倒した！");
-      setTimeout(() => {
-        Utils.showScreen('ending');
-      }, 3000);
+      Utils.showScreen('ending');
     }
   }
 
