@@ -99,6 +99,9 @@ class BattleSystem {
       window.currentJaWord = null;
     }
 
+    this.acceptedInput = "";
+    this.gameState.inputDisplay = null;
+
     // タイマー再設定
     const minTime = 3, maxTime = 20;
     const baseTimePerChar = this.gameState.currentEnemy.timePerChar || 1.0;
@@ -127,23 +130,30 @@ class BattleSystem {
     const rawInput = e.target.value;
     const processedInput = rawInput.toLowerCase().replace(/ /g, "");
     
-    // 最大一致長を探索
-    const prevIndex = this.gameState.currentIndex;
-    const matchLen = this.romajiSystem.getRomajiMatchLength(processedInput, this.gameState.processedWord);
-    this.gameState.currentIndex = matchLen;
+    const result = this.romajiSystem.matchInput(
+      processedInput, this.gameState.processedWord, this.gameState.langMode
+    );
+    const acceptedInput = processedInput.slice(0, result.acceptedLength);
+    const hasMiss = result.acceptedLength < processedInput.length;
+    const hasProgress = acceptedInput.length > (this.acceptedInput || '').length;
+    this.gameState.currentIndex = result.matchedLength;
+    this.acceptedInput = acceptedInput;
+    this.gameState.inputDisplay = {
+      word: this.romajiSystem.getDisplayWord(this.gameState.word, result, this.gameState.langMode),
+      currentIndex: result.acceptedLength
+    };
     
     // 効果音再生
     if (window.audioSystem) {
-      if (matchLen > prevIndex) {
+      if (hasMiss) {
+        window.audioSystem.playSE('typeError');
+      } else if (hasProgress) {
         // 正解音
         window.audioSystem.playSE('typeCorrect');
-      } else if (processedInput.length > matchLen) {
-        // ミス音
-        window.audioSystem.playSE('typeError');
       }
     }
     
-    if (processedInput.length > matchLen) {
+    if (hasMiss) {
       // ミスタイプ時
       this.gameState.missCount++;
       Utils.showMissEffect();
@@ -151,11 +161,12 @@ class BattleSystem {
     
     this.uiSystem.updateLiveFeedback();
     
-    const maxDisplayIndex = this.romajiSystem.getWordIndex(this.gameState.currentIndex - 1, this.gameState.word);
-    e.target.value = maxDisplayIndex >= 0 ? this.gameState.word.slice(0, maxDisplayIndex + 1) : "";
+    // 選んだ別表記と未確定の接頭辞を保持する。
+    e.target.value = acceptedInput;
     e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
     
-    if (this.gameState.currentIndex === this.gameState.processedWord.length) {
+    // 貼り付け等で末尾に余分な文字があっても、正解部分が完了していれば終了。
+    if (result.matchedLength === this.gameState.processedWord.length) {
       this.finishTurn();
     }
   }

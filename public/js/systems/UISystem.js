@@ -57,14 +57,16 @@ class UISystem {
   // リアルタイムフィードバック更新
   updateLiveFeedback() {
     let result = "";
-    const word = this.gameState.word;
+    const display = this.gameState.inputDisplay;
+    const word = display ? display.word : this.gameState.word;
+    const currentIndex = display ? display.currentIndex : this.gameState.currentIndex;
     
     for (let i = 0; i < word.length; i++) {
       if (word[i] === " ") {
         result += `<span style="color:gray">${word[i]}</span>`;
-      } else if (this.romajiSystem.getNonSpaceIndex(i, word) < this.gameState.currentIndex) {
+      } else if (this.romajiSystem.getNonSpaceIndex(i, word) < currentIndex) {
         result += `<span class="correct">${word[i]}</span>`;
-      } else if (this.romajiSystem.getNonSpaceIndex(i, word) === this.gameState.currentIndex) {
+      } else if (this.romajiSystem.getNonSpaceIndex(i, word) === currentIndex) {
         result += `<span class="underline">${word[i]}</span>`;
       } else {
         result += `<span>${word[i]}</span>`;

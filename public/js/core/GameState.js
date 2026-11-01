@@ -19,6 +19,7 @@ class GameState {
     // バトル情報
     this.word = "";
     this.processedWord = "";
+    this.inputDisplay = null;
     this.timer = 10;
     this.timerInterval = null;
     this.countdownInterval = null;
@@ -169,6 +170,7 @@ class GameState {
 
   // バトル状態管理
   resetBattleState() {
+    this.inputDisplay = null;
     this.currentIndex = 0;
     this.missCount = 0;
     this.isTurnFinished = false;
