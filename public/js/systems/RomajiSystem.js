@@ -38,18 +38,30 @@ class RomajiSystem {
       'ー':'-', '　':' ', ' ':' '
     };
 
-    // ローマ字分割候補テーブル
-    this.romaTable = [
-      // 長い順に
-      ["kya","kyu","kyo"],["sha","shu","sho","sya","syu","syo"],["cha","chu","cho","cya","cyu","cyo","tya","tyu","tyo"],
-      ["nya","nyu","nyo"],["hya","hyu","hyo"],["mya","myu","myo"],["rya","ryu","ryo"],
-      ["gya","gyu","gyo"],["ja","ju","jo","jya","jyu","jyo","zya","zyu","zyo"],
-      ["bya","byu","byo"],["pya","pyu","pyo"],
-      ["tsu","tu"],["shi","si"],["chi","ti"],["fu","hu"],["ji","zi"],
-      ["nn","n"],
-      // 1文字
-      ["a"],["i"],["u"],["e"],["o"],["ka"],["ki"],["ku"],["ke"],["ko"],["sa"],["su"],["se"],["so"],["ta"],["te"],["to"],["na"],["ni"],["nu"],["ne"],["no"],["ha"],["hi"],["he"],["ho"],["ma"],["mi"],["mu"],["me"],["mo"],["ya"],["yu"],["yo"],["ra"],["ri"],["ru"],["re"],["ro"],["wa"],["wo"],["ga"],["gi"],["gu"],["ge"],["go"],["za"],["ji"],["zu"],["ze"],["zo"],["da"],["de"],["do"],["ba"],["bi"],["bu"],["be"],["bo"],["pa"],["pi"],["pu"],["pe"],["po"],["xa"],["xi"],["xu"],["xe"],["xo"],["xya"],["xyu"],["xyo"],["xwa"],["la"],["li"],["lu"],["le"],["lo"],["lya"],["lyu"],["lyo"],["lwa"],["xtsu"],["xtu"],["ltu"],["ltsu"]
+    // 同じ音の表記だけをまとめる。異なる拗音（kya/kyu等）は別のトークン。
+    this.variants = [
+      ['shi', 'si'], ['chi', 'ti'], ['tsu', 'tu'], ['fu', 'hu'], ['ji', 'zi'],
+      ['sha', 'sya', 'shya'], ['shu', 'syu', 'shyu'], ['sho', 'syo', 'shyo'],
+      ['cha', 'tya', 'cya'], ['chu', 'tyu', 'cyu'], ['cho', 'tyo', 'cyo'],
+      ['ja', 'jya', 'zya'], ['ju', 'jyu', 'zyu'], ['jo', 'jyo', 'zyo'],
+      ['xa', 'la'], ['xi', 'li'], ['xu', 'lu'], ['xe', 'le'], ['xo', 'lo'],
+      ['xya', 'lya'], ['xyu', 'lyu'], ['xyo', 'lyo'], ['xwa', 'lwa'],
+      ['xtsu', 'xtu', 'ltu', 'ltsu']
     ];
+    for (const consonant of ['k', 'n', 'h', 'm', 'r', 'g', 'b', 'p']) {
+      for (const vowel of ['a', 'u', 'o']) {
+        this.variants.push([
+          consonant + 'y' + vowel,
+          consonant + 'ixy' + vowel,
+          consonant + 'ily' + vowel
+        ]);
+      }
+    }
+    this.variantEntries = this.variants.flatMap(options =>
+      options.map(spelling => ({ spelling, options }))
+    ).sort((a, b) => b.spelling.length - a.spelling.length);
+    this.cachedKey = null;
+    this.cachedTokens = [];
   }
 
   kanaToRomaji(str) {
@@ -88,57 +100,106 @@ class RomajiSystem {
     return result;
   }
 
-  // 入力判定時に"tsu"→"tu"も許容（部分一致・複数表記対応に拡張・バックトラック型）
-  isRomajiMatch(input, answer) {
-    if (input === answer) return true;
-    
-    // answerをローマ字分割する再帰関数
-    const splitRomaji = (str, pos = 0, path = []) => {
-      if (pos === str.length) return [path];
-      let results = [];
-      for (const group of this.romaTable) {
-        for (const roma of group) {
-          if (str.startsWith(roma, pos)) {
-            results = results.concat(splitRomaji(str, pos + roma.length, path.concat(roma)));
-          }
+  // お題をトークン化し、表記の組み合わせを全列挙せず入力候補を追跡する。
+  tokenize(answer, langMode) {
+    const key = langMode + ':' + answer;
+    if (this.cachedKey === key) return this.cachedTokens;
+    const tokens = [];
+    for (let pos = 0; pos < answer.length;) {
+      let spelling = answer[pos];
+      let options = [spelling];
+      if (langMode === 'ja') {
+        const entry = this.variantEntries.find(item => answer.startsWith(item.spelling, pos));
+        if (entry) {
+          spelling = entry.spelling;
+          options = entry.options;
+        } else if (spelling === 'n' && (!answer[pos + 1] || !/[aiueoy]/.test(answer[pos + 1]))) {
+          // na/nya等の子音nは省略・置換しない。
+          options = ['n', 'nn', "n'", 'xn'];
+        } else if (/[bcdfghjklmpqrstvwxyz]/.test(spelling) && answer[pos + 1] === spelling) {
+          options = [spelling, 'xtsu', 'xtu', 'ltu', 'ltsu'];
         }
       }
-      return results;
-    };
-    
-    // inputがanswerの分割パターンの先頭から一致するか
-    const patterns = splitRomaji(answer);
-    for (const ptn of patterns) {
-      let acc = '';
-      for (let i = 0; i < ptn.length; i++) {
-        acc += ptn[i];
-        if (input.length === acc.length && input === acc) return true;
-        // 途中一致も許容
-        if (input.startsWith(acc)) {
-          if (input.length <= acc.length) return true;
-        }
-      }
-      // 1文字ずつ比較（従来の部分一致も残す）
-      if (input === ptn.join('').slice(0, input.length)) return true;
+      tokens.push({ start: pos, end: pos + spelling.length, options });
+      pos += spelling.length;
     }
-    
-    // ん→n（nnでなくてもOK）: input, answerともnを全て除去して一致ならOK
-    if (answer.includes('n')) {
-      if (input.replace(/n/g, '') === answer.replace(/n/g, '').slice(0, input.length)) return true;
-    }
-    
-    return false;
+    this.cachedKey = key;
+    this.cachedTokens = tokens;
+    return tokens;
   }
 
-  // processedInputがprocessedWordの先頭からどこまで一致しているか（ローマ字バリエーション考慮）
-  getRomajiMatchLength(input, answer) {
-    if (!input) return 0;
-    let len = 0;
-    for (let i = 0; i < input.length && i < answer.length; i++) {
-      if (input[i] === answer[i]) len++;
-      else break;
+  matchInput(input, answer, langMode = 'ja') {
+    const tokens = this.tokenize(answer, langMode);
+    const expand = (index, path = []) => index === tokens.length
+      ? [{ index, option: '', offset: 0, path }]
+      : tokens[index].options.map(option => ({ index, option, offset: 0, path }));
+    let states = expand(0);
+    let acceptedLength = 0;
+    for (const char of input) {
+      const next = new Map();
+      for (const state of states) {
+        if (state.option[state.offset] !== char) continue;
+        const offset = state.offset + 1;
+        const candidates = offset === state.option.length
+          ? expand(state.index + 1, [...state.path, state.option])
+          : [{ ...state, offset }];
+        for (const candidate of candidates) {
+          next.set(candidate.index + ':' + candidate.option + ':' + candidate.offset, candidate);
+        }
+      }
+      if (next.size === 0) break;
+      states = [...next.values()];
+      acceptedLength++;
     }
-    return len;
+    // 入力文字数とお題の進捗を分離し、短い別表記でも同じダメージにする。
+    const matchedLength = Math.max(...states.map(state => {
+      if (state.index === tokens.length) return answer.length;
+      const token = tokens[state.index];
+      return token.start + Math.floor((token.end - token.start) * state.offset / state.option.length);
+    }));
+    // 元の表記を優先し、入力により候補が絞られたらその表記を表示する。
+    const preferred = [...states].sort((a, b) => {
+      if (a.index !== b.index) return b.index - a.index;
+      const original = tokens[a.index] && answer.slice(tokens[a.index].start, tokens[a.index].end);
+      return Number(b.option === original) - Number(a.option === original)
+        || a.option.length - b.option.length;
+    })[0];
+    const displayTokens = [...preferred.path];
+    if (preferred.index < tokens.length) displayTokens.push(preferred.option);
+    for (let i = displayTokens.length; i < tokens.length; i++) {
+      displayTokens.push(answer.slice(tokens[i].start, tokens[i].end));
+    }
+    return {
+      acceptedLength,
+      matchedLength,
+      displayTokens,
+      displayAnswer: displayTokens.join(''),
+      complete: acceptedLength === input.length && states.some(state => state.index === tokens.length)
+    };
+  }
+
+  // 空白を元のお題の位置に残しつつ、選択された表記で表示を構築する。
+  getDisplayWord(word, match, langMode) {
+    if (langMode !== 'ja') return word;
+    const answer = word.toLowerCase().replace(/ /g, '');
+    const tokens = this.tokenize(answer, langMode);
+    let result = '';
+    let sourceIndex = 0;
+    for (let i = 0; i < tokens.length; i++) {
+      const start = this.getWordIndex(tokens[i].start, word);
+      const end = this.getWordIndex(tokens[i].end - 1, word) + 1;
+      result += word.slice(sourceIndex, start) + match.displayTokens[i];
+      sourceIndex = end;
+    }
+    return result + word.slice(sourceIndex);
+  }
+
+  isRomajiMatch(input, answer) {
+    return this.matchInput(input, answer).acceptedLength === input.length;
+  }
+
+  getRomajiMatchLength(input, answer, langMode = 'ja') {
+    return this.matchInput(input, answer, langMode).matchedLength;
   }
 
   // 単語内の位置計算ヘルパー

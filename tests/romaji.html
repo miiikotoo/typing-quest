@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<title>ローマ字入力の動作確認</title>
+<style>
+body { max-width: 720px; margin: 40px auto; padding: 0 20px; font: 18px/1.7 sans-serif; }
+input, select, button { font: inherit; padding: 8px; }
+.correct { color: green; } .underline { border-bottom: 2px solid; }
+#word { padding: 20px 0; } #result { white-space: pre-line; }
+</style>
+<h1>ローマ字入力の動作確認</h1>
+<p>時間制限なしで、ゲームと同じ入力処理を確認できます。ローマ字のお題は入力した表記に合わせて切り替わります。</p>
+<label>お題 <select id="sample">
+<optgroup label="単音：し・ち・つ・ふ・じ">
+<option value="shi">し：shi（shi / si）</option>
+<option value="si">し：si（si / shi）</option>
+<option value="chi">ち：chi（chi / ti）</option>
+<option value="ti">ち：ti（ti / chi）</option>
+<option value="tsu">つ：tsu（tsu / tu）</option>
+<option value="tu">つ：tu（tu / tsu）</option>
+<option value="fu">ふ：fu（fu / hu）</option>
+<option value="hu">ふ：hu（hu / fu）</option>
+<option value="ji">じ：ji（ji / zi）</option>
+<option value="zi">じ：zi（zi / ji）</option>
+</optgroup>
+<optgroup label="拗音・小文字・ん・促音">
+<option value="sha">しゃ：sha（sha / sya / shya）</option>
+<option value="cha">ちゃ：cha（cha / tya / cya）</option>
+<option value="ja">じゃ：ja（ja / jya / zya）</option>
+<option value="kya">きゃ：kya（kya / kixya / kilya）</option>
+<option value="xa">ぁ：xa（xa / la）</option>
+<option value="xtsu">っ：xtsu（xtsu / xtu / ltu / ltsu）</option>
+<option value="shinpi">しんぴ：shinpi（sinpi / shinnpi / shin'pi / shixnpi）</option>
+<option value="kka">っか：kka（kka / xtuka / xtsuka / ltuka）</option>
+</optgroup>
+<optgroup label="単語・英語">
+<option value="shinjitsu">真実：shinjitsu（sinnzitu など）</option>
+<option value="doukutsu">洞窟：doukutsu（doukutu など）</option>
+<option value="shimettakuuki">湿った空気：shimettakuuki（simeltutakuuki など）</option>
+<option value="kyaku">きゃく：kyaku（kilyaku など）</option>
+<option value="fish">英語：fish（fisi は不正解）</option>
+</optgroup>
+</select></label>
+<button id="reset">やり直す</button>
+<div id="word"></div>
+<label>入力 <input id="input" autocomplete="off" spellcheck="false"></label>
+<p id="result" role="status"></p>
+<script src="../public/js/systems/RomajiSystem.js?v=dynamic-display"></script>
+<script src="../public/js/systems/UISystem.js?v=dynamic-display"></script>
+<script src="../public/js/systems/BattleSystem.js?v=dynamic-display"></script>
+<script>
+const Utils = { showMissEffect() {} };
+const romaji = new RomajiSystem();
+const ui = new UISystem();
+const battle = new BattleSystem();
+const field = document.getElementById('input');
+const result = document.getElementById('result');
+window.addEventListener('error', event => { result.textContent = `エラー：${event.message}`; });
+let state;
+function update() {
+  const display = state.inputDisplay;
+  const index = display ? display.currentIndex : state.currentIndex;
+  const length = display ? display.word.replace(/ /g, '').length : state.processedWord.length;
+  result.textContent = `進捗：${index} / ${length}\nミス：${state.missCount}\n${state.isTurnFinished ? '入力完了' : '入力中'}`;
+}
+battle.finishTurn = () => { state.isTurnFinished = true; field.disabled = true; };
+function reset() {
+  const word = document.getElementById('sample').value;
+  state = { word, processedWord: word, langMode: word === 'fish' ? 'en' : 'ja', currentIndex: 0, missCount: 0, isTurnFinished: false };
+  window.currentJaWord = null;
+  ui.init(state, romaji);
+  battle.init(state, null, romaji, ui);
+  battle.acceptedInput = '';
+  field.value = '';
+  field.disabled = false;
+  ui.updateLiveFeedback();
+  update();
+}
+field.oninput = event => { battle.handleInput(event); update(); };
+document.getElementById('sample').onchange = reset;
+document.getElementById('reset').onclick = () => { reset(); field.focus(); };
+reset();
+</script>
+</html>
