@@ -18,16 +18,6 @@ class BattleSystem {
   startBattle(isNewBattle = false) {
     if (this.gameState.playerHP <= 0 || this.gameState.stageEnemies.length === 0) return;
     
-    // バトルBGM再生（ラスボス判定）
-    if (isNewBattle && window.audioSystem) {
-      // 魔王（ラスボス）の場合は専用BGMを再生
-      if (this.gameState.currentEnemy && this.gameState.currentEnemy.name === '魔王') {
-        window.audioSystem.playBossBattleBGM();
-      } else {
-        window.audioSystem.playBattleBGM();
-      }
-    }
-    
     // UI初期化
     this.uiSystem.showButtons({
       startBtn: false,
@@ -46,6 +36,15 @@ class BattleSystem {
       this.gameState.currentEnemy = this.gameState.stageEnemies[Math.floor(Math.random() * this.gameState.stageEnemies.length)];
       this.gameState.enemyHP = this.gameState.currentEnemy.maxHP;
       this.uiSystem.updateEnemyDisplay();
+    }
+
+    // 今回戦う敵を確定してからBGMを選ぶ。
+    if (isNewBattle && window.audioSystem) {
+      if (this.gameState.currentEnemy.name === '魔王') {
+        window.audioSystem.playBossBattleBGM();
+      } else {
+        window.audioSystem.playBattleBGM();
+      }
     }
 
     this.gameState.resetBattleState();
