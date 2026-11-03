@@ -19,6 +19,7 @@ class AudioSystem {
 
     // オーディオオブジェクト
     this.currentBGM = null;
+    this.bgmRequestId = 0;
     this.audioCache = new Map();
     
     // Web Audio API用のコンテキスト（共有）
@@ -131,29 +132,36 @@ class AudioSystem {
       return;
     }
 
-    try {
-      // 現在のBGMを停止
-      this.stopBGM();
+    // 停止・曲変更で古い読み込み要求を無効にする。
+    this.stopBGM();
+    const requestId = this.bgmRequestId;
 
+    try {
       // 新しいBGMを読み込み・再生
       const audio = await this.preloadAudio(path);
+      if (requestId !== this.bgmRequestId || !this.isBGMEnabled) return;
       audio.volume = this.bgmVolume;
       audio.loop = options.loop !== false; // デフォルトはループ
-      
+      // play()の完了待ち中にもstopBGM()から停止できるようにする。
+      this.currentBGM = audio;
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         await playPromise;
       }
       
-      this.currentBGM = audio;
+      if (requestId !== this.bgmRequestId || !this.isBGMEnabled) return;
       console.log(`BGM再生開始: ${trackName}`);
     } catch (error) {
+      // 古い要求の失敗で新しい曲を止めない。
+      if (requestId !== this.bgmRequestId) return;
+      this.stopBGM();
       console.warn(`BGM再生エラー: ${trackName}`, error);
     }
   }
 
   // BGM停止
   stopBGM() {
+    this.bgmRequestId++;
     if (this.currentBGM) {
       this.currentBGM.pause();
       this.currentBGM.currentTime = 0;
