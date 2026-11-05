@@ -1,9 +1,15 @@
-
 {
   "name": "typing-quest",
   "compatibility_date": "2026-11-05",
+  "workers_dev": true,
   "assets": {
     "directory": "./public"
   },
-  "previews": {}
+  "previews": {},
+  "routes": [
+    {
+      "pattern": "typing-quest.mikoto0506.site",
+      "custom_domain": true
+    }
+  ]
 }
