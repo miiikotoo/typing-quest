@@ -5,6 +5,7 @@
   "assets": {
     "directory": "./public"
   },
+  "previews": {},
   "routes": [
     {
       "pattern": "typing-quest.mikoto0506.site",
